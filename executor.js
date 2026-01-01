@@ -1,10 +1,8 @@
-// Главный объект исполнителя
+// Приложение исполнителя
 const ExecutorApp = {
     currentUser: null,
-    currentSection: 'dashboard',
-    currentOrderId: null,
-    currentChatId: null,
     
+    // Инициализация
     init() {
         this.loadUser();
         if (!this.currentUser) {
@@ -15,9 +13,10 @@ const ExecutorApp = {
         this.setupEventListeners();
         this.updateUI();
         this.loadDashboardData();
-        this.setupKanban();
+        this.setupNavigation();
     },
     
+    // Загрузка пользователя
     loadUser() {
         const userData = localStorage.getItem('currentUser');
         if (userData) {
@@ -25,305 +24,147 @@ const ExecutorApp = {
         }
     },
     
-    setupEventListeners() {
-        // Навигация
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const section = item.getAttribute('data-section');
-                this.navigateTo(section);
-            });
-        });
-        
-        // Выход
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        });
-        
-        // Поиск заказов
-        document.getElementById('search-orders').addEventListener('input', (e) => {
-            this.searchOrders(e.target.value);
-        });
-        
-        // Фильтры
-        document.getElementById('filter-status').addEventListener('change', () => this.loadAllOrders());
-        document.getElementById('filter-type').addEventListener('change', () => this.loadAllOrders());
-        document.getElementById('filter-budget').addEventListener('change', () => this.loadAllOrders());
-        
-        // Переключение вида
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const view = btn.getAttribute('data-view');
-                this.switchView(view);
-            });
-        });
-        
-        // Закрытие модальных окон
-        document.getElementById('modal-close').addEventListener('click', () => {
-            document.getElementById('order-modal').classList.remove('active');
-        });
-        
-        document.getElementById('client-modal-close').addEventListener('click', () => {
-            document.getElementById('client-modal').classList.remove('active');
-        });
-        
-        // Смена статуса
-        document.getElementById('status-select').addEventListener('change', (e) => {
-            this.updateUserStatus(e.target.value);
-        });
+    // Получение данных
+    getData() {
+        return JSON.parse(localStorage.getItem('sitecore_data')) || { clients: [], orders: [], messages: {}, executors: [] };
     },
     
-    navigateTo(section) {
-        // Обновляем активную навигацию
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('data-section') === section) {
-                item.classList.add('active');
-            }
-        });
-        
-        // Скрываем все секции
-        document.querySelectorAll('.content-section').forEach(sec => {
-            sec.classList.remove('active');
-        });
-        
-        // Показываем выбранную секцию
-        document.getElementById(`${section}-section`).classList.add('active');
-        
-        // Обновляем заголовок
-        this.updatePageTitle(section);
-        
-        // Загружаем данные для секции
-        switch(section) {
-            case 'dashboard':
-                this.loadDashboardData();
-                break;
-            case 'all-orders':
-                this.loadAllOrders();
-                break;
-            case 'my-orders':
-                this.loadMyOrders();
-                break;
-            case 'messages':
-                this.loadExecutorConversations();
-                break;
-            case 'clients':
-                this.loadClients();
-                break;
-            case 'profile':
-                this.loadExecutorProfile();
-                break;
-        }
-        
-        this.currentSection = section;
+    // Сохранение данных
+    saveData(data) {
+        localStorage.setItem('sitecore_data', JSON.stringify(data));
     },
     
-    updatePageTitle(section) {
-        const titles = {
-            'dashboard': 'Панель исполнителя',
-            'all-orders': 'Все заказы',
-            'my-orders': 'Мои заказы',
-            'messages': 'Сообщения',
-            'clients': 'Клиенты',
-            'profile': 'Профиль'
-        };
-        
-        document.getElementById('page-title').textContent = titles[section] || 'Панель исполнителя';
-        document.getElementById('page-subtitle').textContent = 'SiteCore Platform';
+    // Получение доступных заказов
+    getAvailableOrders() {
+        const data = this.getData();
+        return data.orders.filter(order => order.status === 'new' && !order.assignedTo);
     },
     
+    // Получение заказов исполнителя
+    getMyOrders() {
+        const data = this.getData();
+        return data.orders.filter(order => order.assignedTo === this.currentUser.id);
+    },
+    
+    // Обновление интерфейса
     updateUI() {
         if (!this.currentUser) return;
         
-        // Обновляем информацию пользователя
+        // Обновляем информацию об исполнителе
         document.getElementById('executor-name').textContent = this.currentUser.name;
-        document.getElementById('executor-position').textContent = this.currentUser.position;
         document.getElementById('executor-avatar').textContent = this.currentUser.avatar;
-        document.getElementById('executor-rating').textContent = this.currentUser.rating;
-        document.getElementById('executor-projects').textContent = `${this.currentUser.completedProjects} проектов`;
+        document.getElementById('executor-role').textContent = this.currentUser.specialization || 'Разработчик';
         document.getElementById('welcome-name').textContent = this.currentUser.name;
         
+        document.getElementById('profile-name').textContent = this.currentUser.name;
+        document.getElementById('profile-avatar').textContent = this.currentUser.avatar;
+        document.getElementById('profile-specialization').textContent = this.currentUser.specialization || 'Разработчик';
+        document.getElementById('profile-specialization-value').textContent = this.currentUser.specialization || 'Разработчик';
+        document.getElementById('profile-status').textContent = this.currentUser.status || 'Online';
+        
+        // Обновляем дату
+        this.updateDate();
+        
         // Обновляем статистику
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
-        const activeOrders = myOrders.filter(o => o.status === 'in_progress').length;
-        const deadlineOrders = myOrders.filter(o => {
-            if (!o.deadlineDate) return false;
-            const deadline = new Date(o.deadlineDate);
-            const today = new Date();
-            const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-            return daysLeft <= 3 && o.status !== 'completed';
-        }).length;
+        this.updateStats();
+    },
+    
+    // Обновление даты
+    updateDate() {
+        const now = new Date();
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        document.getElementById('current-date').textContent = 
+            now.toLocaleDateString('ru-RU', options);
+    },
+    
+    // Обновление статистики
+    updateStats() {
+        const availableOrders = this.getAvailableOrders();
+        const myOrders = this.getMyOrders();
         
-        document.getElementById('active-tasks').textContent = activeOrders;
-        document.getElementById('deadline-tasks').textContent = deadlineOrders;
-        
-        // Обновляем счётчики
-        document.getElementById('all-orders-count').textContent = orders.filter(o => !o.assignedTo).length;
+        // Обновляем счетчики
+        document.getElementById('available-orders-count').textContent = availableOrders.length;
         document.getElementById('my-orders-count').textContent = myOrders.length;
+        
+        document.getElementById('active-tasks').textContent = 
+            myOrders.filter(o => o.status === 'in-progress').length;
+        document.getElementById('available-tasks').textContent = availableOrders.length;
+        
+        document.getElementById('available-count').textContent = availableOrders.length;
+        document.getElementById('my-count').textContent = myOrders.length;
+        document.getElementById('in-progress-count').textContent = 
+            myOrders.filter(o => o.status === 'in-progress').length;
+        document.getElementById('review-count').textContent = 
+            myOrders.filter(o => o.status === 'review').length;
+        
+        // Общая статистика
+        const data = this.getData();
+        const allOrders = data.orders;
+        
+        const totalOrders = allOrders.length;
+        const totalRevenue = allOrders
+            .filter(o => o.status === 'completed')
+            .reduce((sum, o) => sum + (o.budget || 0), 0);
+        
+        document.getElementById('total-orders').textContent = totalOrders;
+        document.getElementById('total-revenue').textContent = this.formatCurrency(totalRevenue);
+        
+        // Статистика профиля
+        const completedOrders = myOrders.filter(o => o.status === 'completed').length;
+        const myRevenue = myOrders
+            .filter(o => o.status === 'completed')
+            .reduce((sum, o) => sum + (o.budget || 0), 0);
+        
+        document.getElementById('profile-total-orders').textContent = completedOrders;
+        document.getElementById('profile-total-revenue').textContent = this.formatCurrency(myRevenue);
+        document.getElementById('stats-total-orders').textContent = myOrders.length;
+        document.getElementById('stats-completed').textContent = completedOrders;
+        document.getElementById('stats-in-progress').textContent = 
+            myOrders.filter(o => o.status === 'in-progress').length;
+        document.getElementById('stats-revenue').textContent = this.formatCurrency(myRevenue);
     },
     
+    // Загрузка данных дашборда
     loadDashboardData() {
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
+        // Обновляем статистику
+        this.updateStats();
         
-        // Приоритетные задачи
-        const priorityList = document.getElementById('priority-list');
-        const priorityOrders = myOrders
-            .filter(o => o.status === 'in_progress')
-            .sort((a, b) => {
-                const aDeadline = new Date(a.deadlineDate || a.createdDate);
-                const bDeadline = new Date(b.deadlineDate || b.createdDate);
-                return aDeadline - bDeadline;
-            })
-            .slice(0, 3);
+        // Загружаем доступные заказы
+        this.loadAvailableOrders();
         
-        if (priorityOrders.length === 0) {
-            priorityList.innerHTML = `
-                <div class="empty-priority">
-                    <i class="fas fa-check-circle"></i>
-                    <p>Нет активных задач</p>
-                </div>
-            `;
-        } else {
-            priorityList.innerHTML = priorityOrders.map(order => `
-                <div class="priority-item ${this.isUrgent(order) ? 'urgent' : ''}">
-                    <h4>${order.projectName}</h4>
-                    <p>${order.prompt.substring(0, 60)}...</p>
-                    <div class="priority-meta">
-                        <span>${this.formatCurrency(order.budget)}</span>
-                        <span>${this.getDaysLeft(order)} дней</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // Статистика за месяц
-        const monthAgo = new Date();
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        
-        const monthOrders = myOrders.filter(o => 
-            new Date(o.createdDate) >= monthAgo && o.status === 'completed'
-        );
-        
-        const monthRevenue = monthOrders.reduce((sum, o) => sum + (o.budget || 0), 0);
-        const avgTime = monthOrders.length > 0 ? 
-            monthOrders.reduce((sum, o) => {
-                const start = new Date(o.createdDate);
-                const end = new Date(o.completedDate || new Date());
-                return sum + Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-            }, 0) / monthOrders.length : 0;
-        
-        document.getElementById('month-completed').textContent = monthOrders.length;
-        document.getElementById('month-revenue').textContent = this.formatCurrency(monthRevenue);
-        document.getElementById('avg-time').textContent = `${Math.round(avgTime)} дн.`;
-        document.getElementById('satisfaction').textContent = '96%';
-        
-        // Сегодняшние задачи
-        document.getElementById('today-tasks').textContent = priorityOrders.length;
-        
-        // Последняя активность
-        this.loadActivity();
+        // Загружаем заказы исполнителя
+        this.loadMyOrders();
     },
     
-    loadActivity() {
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
-        
-        const activityList = document.getElementById('activity-list');
-        const recentActivities = [];
-        
-        // Собираем активности из заказов
-        myOrders.forEach(order => {
-            recentActivities.push({
-                type: 'order',
-                orderId: order.id,
-                clientId: order.clientId,
-                clientName: order.clientName,
-                projectName: order.projectName,
-                action: this.getOrderAction(order),
-                time: order.updatedDate || order.createdDate
-            });
-        });
-        
-        // Сортируем по времени
-        recentActivities.sort((a, b) => new Date(b.time) - new Date(a.time));
-        
-        activityList.innerHTML = recentActivities.slice(0, 5).map(activity => `
-            <div class="activity-item">
-                <div class="activity-header">
-                    <div class="activity-avatar">${activity.clientName.charAt(0)}</div>
-                    <span class="activity-client">${activity.clientName}</span>
-                    <span class="activity-time">${new Date(activity.time).toLocaleDateString()}</span>
-                </div>
-                <div class="activity-text">
-                    ${activity.action} для проекта "${activity.projectName}"
-                </div>
-            </div>
-        `).join('');
-    },
-    
-    getOrderAction(order) {
-        switch(order.status) {
-            case 'new': return 'Создан новый заказ';
-            case 'in_progress': return 'Взят в работу';
-            case 'review': return 'Отправлен на проверку';
-            case 'completed': return 'Завершён';
-            default: return 'Обновлён';
-        }
-    },
-    
-    loadAllOrders() {
-        const statusFilter = document.getElementById('filter-status').value;
-        const typeFilter = document.getElementById('filter-type').value;
-        const budgetFilter = document.getElementById('filter-budget').value;
-        
-        let orders = DataManager.getOrders().filter(o => !o.assignedTo);
-        
-        // Применяем фильтры
-        if (statusFilter !== 'all') {
-            orders = orders.filter(o => o.status === statusFilter);
-        }
-        
-        if (typeFilter !== 'all') {
-            orders = orders.filter(o => o.projectType === typeFilter);
-        }
-        
-        if (budgetFilter !== 'all') {
-            switch(budgetFilter) {
-                case 'low':
-                    orders = orders.filter(o => o.budget <= 50000);
-                    break;
-                case 'medium':
-                    orders = orders.filter(o => o.budget > 50000 && o.budget <= 150000);
-                    break;
-                case 'high':
-                    orders = orders.filter(o => o.budget > 150000);
-                    break;
-            }
-        }
-        
-        const ordersGrid = document.getElementById('all-orders-grid');
+    // Загрузка доступных заказов
+    loadAvailableOrders() {
+        const orders = this.getAvailableOrders();
+        const grid = document.getElementById('available-orders-grid');
         
         if (orders.length === 0) {
-            ordersGrid.innerHTML = `
-                <div class="empty-orders">
-                    <i class="fas fa-clipboard-check"></i>
-                    <p>Нет доступных заказов</p>
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i>📝</i>
+                    <h3>Нет доступных заказов</h3>
+                    <p>Все текущие заказы уже взяты в работу</p>
                 </div>
             `;
             return;
         }
         
-        ordersGrid.innerHTML = orders.map(order => `
-            <div class="order-card ${this.isPriority(order) ? 'priority' : ''}">
+        grid.innerHTML = orders.map(order => `
+            <div class="order-card" data-id="${order.id}">
                 <div class="order-header">
                     <div>
                         <div class="order-title">${order.projectName}</div>
                         <div class="order-client">${order.clientName}</div>
                     </div>
-                    <span class="order-badge ${order.status}">${this.getStatusText(order.status)}</span>
+                    <div class="order-badge new">Новый</div>
                 </div>
                 
                 <div class="order-budget">${this.formatCurrency(order.budget)}</div>
@@ -331,9 +172,7 @@ const ExecutorApp = {
                 <div class="order-details">
                     <div class="order-detail">
                         <span class="order-detail-label">Тип</span>
-                        <span class="order-detail-value">
-                            ${order.projectType === 'static' ? 'Статический' : 'Динамический'}
-                        </span>
+                        <span class="order-detail-value">${this.getTypeText(order.projectType)}</span>
                     </div>
                     <div class="order-detail">
                         <span class="order-detail-label">Срок</span>
@@ -349,7 +188,7 @@ const ExecutorApp = {
                     </div>
                 </div>
                 
-                <div class="order-prompt-preview">
+                <div class="order-preview">
                     <p>${order.prompt.substring(0, 100)}...</p>
                 </div>
                 
@@ -360,487 +199,392 @@ const ExecutorApp = {
             </div>
         `).join('');
         
-        // Обработчики кнопок
-        document.querySelectorAll('.btn-take').forEach(button => {
-            button.addEventListener('click', (e) => {
+        // Добавляем обработчики
+        document.querySelectorAll('.btn-take').forEach(btn => {
+            btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const orderId = parseInt(button.getAttribute('data-id'));
+                const orderId = parseInt(btn.getAttribute('data-id'));
                 this.takeOrder(orderId);
             });
         });
         
-        document.querySelectorAll('.btn-view').forEach(button => {
-            button.addEventListener('click', (e) => {
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const orderId = parseInt(button.getAttribute('data-id'));
-                this.viewOrderDetails(orderId, true);
+                const orderId = parseInt(btn.getAttribute('data-id'));
+                this.viewOrderDetails(orderId);
             });
         });
         
         document.querySelectorAll('.order-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const orderId = parseInt(card.querySelector('.btn-take').getAttribute('data-id'));
-                this.viewOrderDetails(orderId, true);
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('btn-take') && !e.target.classList.contains('btn-view')) {
+                    const orderId = parseInt(card.getAttribute('data-id'));
+                    this.viewOrderDetails(orderId);
+                }
             });
         });
     },
     
-    takeOrder(orderId) {
-        const updatedOrder = DataManager.assignOrder(orderId, this.currentUser.id);
+    // Загрузка заказов исполнителя
+    loadMyOrders() {
+        const orders = this.getMyOrders();
+        const grid = document.getElementById('my-orders-grid');
         
-        if (updatedOrder) {
-            this.showNotification('Заказ успешно взят в работу!', 'success');
-            this.updateUI();
-            this.loadAllOrders();
-            this.loadMyOrders();
-        } else {
-            this.showNotification('Ошибка при взятии заказа', 'error');
+        if (orders.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i>👨‍💻</i>
+                    <h3>У вас пока нет заказов</h3>
+                    <p>Возьмите первый заказ из доступных</p>
+                </div>
+            `;
+            return;
         }
+        
+        grid.innerHTML = orders.map(order => `
+            <div class="my-order-card" data-id="${order.id}">
+                <div class="my-order-header">
+                    <div class="my-order-title">${order.projectName}</div>
+                    <select class="status-select" data-id="${order.id}">
+                        <option value="in-progress" ${order.status === 'in-progress' ? 'selected' : ''}>В работе</option>
+                        <option value="review" ${order.status === 'review' ? 'selected' : ''}>На проверке</option>
+                        <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>Завершён</option>
+                    </select>
+                </div>
+                
+                <div class="my-order-info">
+                    <div class="my-order-info-item">
+                        <span class="my-order-info-label">Клиент:</span>
+                        <span class="my-order-info-value">${order.clientName}</span>
+                    </div>
+                    <div class="my-order-info-item">
+                        <span class="my-order-info-label">Бюджет:</span>
+                        <span class="my-order-info-value">${this.formatCurrency(order.budget)}</span>
+                    </div>
+                    <div class="my-order-info-item">
+                        <span class="my-order-info-label">Срок:</span>
+                        <span class="my-order-info-value">${order.deadline} дней</span>
+                    </div>
+                    <div class="my-order-info-item">
+                        <span class="my-order-info-label">Создан:</span>
+                        <span class="my-order-info-value">${new Date(order.createdDate).toLocaleDateString()}</span>
+                    </div>
+                </div>
+                
+                <div class="my-order-actions">
+                    <button class="btn-small primary" data-id="${order.id}">Подробнее</button>
+                    <button class="btn-small secondary" data-id="${order.id}">Чат с клиентом</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // Добавляем обработчики
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const orderId = parseInt(e.target.getAttribute('data-id'));
+                const newStatus = e.target.value;
+                this.updateOrderStatus(orderId, newStatus);
+            });
+        });
+        
+        document.querySelectorAll('.btn-small.primary').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = parseInt(btn.getAttribute('data-id'));
+                this.viewOrderDetails(orderId);
+            });
+        });
+        
+        document.querySelectorAll('.btn-small.secondary').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = parseInt(btn.getAttribute('data-id'));
+                this.openChat(orderId);
+            });
+        });
     },
     
-    viewOrderDetails(orderId, showActions = false) {
-        const orders = DataManager.getOrders();
-        const order = orders.find(o => o.id === orderId);
+    // Взять заказ в работу
+    takeOrder(orderId) {
+        const data = this.getData();
+        const orderIndex = data.orders.findIndex(o => o.id === orderId);
+        
+        if (orderIndex === -1) {
+            this.showNotification('Заказ не найден', 'error');
+            return;
+        }
+        
+        // Обновляем заказ
+        data.orders[orderIndex] = {
+            ...data.orders[orderIndex],
+            assignedTo: this.currentUser.id,
+            status: 'in-progress',
+            updatedDate: new Date().toISOString()
+        };
+        
+        this.saveData(data);
+        
+        // Показываем уведомление
+        this.showNotification('Заказ взят в работу!', 'success');
+        
+        // Обновляем данные
+        this.loadDashboardData();
+    },
+    
+    // Обновить статус заказа
+    updateOrderStatus(orderId, newStatus) {
+        const data = this.getData();
+        const orderIndex = data.orders.findIndex(o => o.id === orderId);
+        
+        if (orderIndex === -1) {
+            this.showNotification('Заказ не найден', 'error');
+            return;
+        }
+        
+        // Обновляем заказ
+        data.orders[orderIndex] = {
+            ...data.orders[orderIndex],
+            status: newStatus,
+            updatedDate: new Date().toISOString()
+        };
+        
+        this.saveData(data);
+        
+        // Показываем уведомление
+        this.showNotification('Статус заказа обновлён', 'success');
+        
+        // Обновляем данные
+        this.loadDashboardData();
+    },
+    
+    // Просмотр деталей заказа
+    viewOrderDetails(orderId) {
+        const data = this.getData();
+        const order = data.orders.find(o => o.id === orderId);
         
         if (!order) return;
         
-        // Получаем информацию о клиенте
-        const clients = DataManager.getClients();
-        const client = clients.find(c => c.id === order.clientId);
+        const client = data.clients.find(c => c.id === order.clientId);
         
-        const modal = document.getElementById('order-modal');
-        const modalBody = document.getElementById('order-info-grid');
-        const clientCard = document.getElementById('client-card');
-        const promptContent = document.getElementById('modal-prompt-content');
-        const modalActions = document.getElementById('modal-actions');
-        
-        // Информация о заказе
-        modalBody.innerHTML = `
-            <div class="info-item">
-                <span class="info-label">Название:</span>
-                <span class="info-value">${order.projectName}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Тип:</span>
-                <span class="info-value">${order.projectType === 'static' ? 'Статический сайт' : 'Динамический сайт'}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Бюджет:</span>
-                <span class="info-value">${this.formatCurrency(order.budget)}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Срок:</span>
-                <span class="info-value">${order.deadline} дней</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Статус:</span>
-                <span class="info-value status-${order.status}">${this.getStatusText(order.status)}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Создан:</span>
-                <span class="info-value">${new Date(order.createdDate).toLocaleDateString()}</span>
-            </div>
-            ${order.assignedTo ? `
-            <div class="info-item">
-                <span class="info-label">Исполнитель:</span>
-                <span class="info-value">${this.getExecutorName(order.assignedTo)}</span>
-            </div>
-            ` : ''}
-        `;
-        
-        // Информация о клиенте
-        clientCard.innerHTML = client ? `
-            <div class="client-info">
-                <div class="client-avatar">${client.avatar}</div>
-                <h4>${client.name}</h4>
-                <p>${client.email}</p>
-                <div class="client-contact">
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <span>${client.phone}</span>
+        const html = `
+            <div style="padding: 20px; max-width: 600px;">
+                <h3 style="margin-bottom: 24px; color: var(--dark);">${order.projectName}</h3>
+                
+                <div style="display: grid; gap: 16px; margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Клиент:</span>
+                        <span style="font-weight: 600;">${order.clientName}</span>
                     </div>
-                    <div class="contact-item">
-                        <i class="fab fa-telegram"></i>
-                        <span>${client.telegram}</span>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Email:</span>
+                        <span style="font-weight: 600;">${order.clientEmail}</span>
                     </div>
-                </div>
-            </div>
-        ` : '<p>Информация о клиенте не найдена</p>';
-        
-        // Промт
-        promptContent.textContent = order.prompt;
-        
-        // Статистика промта
-        document.getElementById('prompt-length').textContent = `${order.prompt.length} символов`;
-        document.getElementById('prompt-read-time').textContent = 
-            `Время чтения: ${Math.ceil(order.prompt.length / 1000)} мин`;
-        
-        // Кнопки действий
-        if (showActions && !order.assignedTo) {
-            modalActions.innerHTML = `
-                <button class="btn-secondary" id="modal-close-btn">Закрыть</button>
-                <button class="btn-primary" id="modal-take-btn">Взять в работу</button>
-            `;
-            
-            document.getElementById('modal-take-btn').addEventListener('click', () => {
-                this.takeOrder(orderId);
-                modal.classList.remove('active');
-            });
-            
-            document.getElementById('modal-close-btn').addEventListener('click', () => {
-                modal.classList.remove('active');
-            });
-        } else {
-            modalActions.innerHTML = `
-                <button class="btn-primary" id="modal-close-btn">Закрыть</button>
-            `;
-            
-            document.getElementById('modal-close-btn').addEventListener('click', () => {
-                modal.classList.remove('active');
-            });
-        }
-        
-        document.getElementById('modal-order-title').textContent = order.projectName;
-        modal.classList.add('active');
-    },
-    
-    loadMyOrders() {
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
-        
-        // Обновляем колонки Канбан
-        this.updateKanbanColumns(myOrders);
-        
-        // Обновляем счётчики
-        document.getElementById('new-count').textContent = 
-            myOrders.filter(o => o.status === 'new').length;
-        document.getElementById('progress-count').textContent = 
-            myOrders.filter(o => o.status === 'in_progress').length;
-        document.getElementById('review-count').textContent = 
-            myOrders.filter(o => o.status === 'review').length;
-        document.getElementById('completed-count').textContent = 
-            myOrders.filter(o => o.status === 'completed').length;
-    },
-    
-    setupKanban() {
-        const columns = document.querySelectorAll('.kanban-column');
-        
-        columns.forEach(column => {
-            const columnBody = column.querySelector('.column-body');
-            
-            columnBody.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                columnBody.style.background = 'rgba(102, 126, 234, 0.05)';
-            });
-            
-            columnBody.addEventListener('dragleave', () => {
-                columnBody.style.background = '';
-            });
-            
-            columnBody.addEventListener('drop', (e) => {
-                e.preventDefault();
-                columnBody.style.background = '';
-                
-                const cardId = e.dataTransfer.getData('text/plain');
-                const card = document.querySelector(`[data-id="${cardId}"]`);
-                const newStatus = column.id.replace('-column', '');
-                
-                if (card && card.dataset.status !== newStatus) {
-                    this.updateOrderStatus(cardId, newStatus);
-                }
-            });
-        });
-    },
-    
-    updateKanbanColumns(orders) {
-        const columns = ['new', 'progress', 'review', 'completed'];
-        
-        columns.forEach(status => {
-            const column = document.getElementById(`${status}-column`);
-            const statusKey = status === 'progress' ? 'in_progress' : status;
-            const columnOrders = orders.filter(o => o.status === statusKey);
-            
-            column.innerHTML = columnOrders.map(order => `
-                <div class="kanban-card" 
-                     data-id="${order.id}" 
-                     data-status="${order.status}"
-                     draggable="true">
-                    <h5>${order.projectName}</h5>
-                    <p>${order.clientName}</p>
-                    <div class="kanban-meta">
-                        <span>${this.formatCurrency(order.budget)}</span>
-                        <span>${this.getDaysLeft(order)} дн.</span>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Телефон:</span>
+                        <span style="font-weight: 600;">${order.clientPhone}</span>
                     </div>
-                </div>
-            `).join('');
-            
-            // Добавляем обработчики перетаскивания
-            column.querySelectorAll('.kanban-card').forEach(card => {
-                card.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', card.dataset.id);
-                    card.classList.add('dragging');
-                });
-                
-                card.addEventListener('dragend', () => {
-                    card.classList.remove('dragging');
-                });
-                
-                card.addEventListener('click', () => {
-                    this.viewOrderDetails(parseInt(card.dataset.id));
-                });
-            });
-        });
-    },
-    
-    updateOrderStatus(orderId, newStatus) {
-        const updatedOrder = DataManager.updateOrderStatus(orderId, newStatus);
-        
-        if (updatedOrder) {
-            this.showNotification('Статус заказа обновлён', 'success');
-            this.loadMyOrders();
-            this.updateUI();
-        }
-    },
-    
-    loadExecutorConversations() {
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
-        const messages = DataManager.getMessages();
-        
-        const conversationsList = document.getElementById('executor-conversations');
-        
-        if (myOrders.length === 0) {
-            conversationsList.innerHTML = `
-                <div class="empty-conversations">
-                    <i class="fas fa-comments"></i>
-                    <p>У вас пока нет диалогов</p>
-                </div>
-            `;
-            return;
-        }
-        
-        conversationsList.innerHTML = myOrders.map(order => {
-            const orderMessages = messages[order.id] || [];
-            const lastMessage = orderMessages[orderMessages.length - 1];
-            
-            return `
-                <div class="conversation-item" data-id="${order.id}">
-                    <div class="conversation-header">
-                        <div class="conversation-avatar">${order.clientName.charAt(0)}</div>
-                        <div class="conversation-info">
-                            <h4>${order.projectName}</h4>
-                            <p>${order.clientName}</p>
-                        </div>
-                        ${lastMessage ? `
-                        <span class="conversation-time">
-                            ${new Date(lastMessage.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Telegram:</span>
+                        <span style="font-weight: 600;">${order.clientTelegram}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Тип сайта:</span>
+                        <span style="font-weight: 600;">${this.getTypeText(order.projectType)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Бюджет:</span>
+                        <span style="font-weight: 600;">${this.formatCurrency(order.budget)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Срок:</span>
+                        <span style="font-weight: 600;">${order.deadline} дней</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Статус:</span>
+                        <span class="order-status status-${order.status}">
+                            ${this.getStatusText(order.status)}
                         </span>
-                        ` : ''}
                     </div>
-                    ${lastMessage ? `
-                    <div class="conversation-preview">
-                        ${lastMessage.text.length > 50 ? lastMessage.text.substring(0, 50) + '...' : lastMessage.text}
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray);">Создан:</span>
+                        <span style="font-weight: 600;">${new Date(order.createdDate).toLocaleDateString()}</span>
                     </div>
-                    ` : ''}
                 </div>
-            `;
-        }).join('');
-        
-        // Обработчики кликов по диалогам
-        document.querySelectorAll('.conversation-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const orderId = parseInt(item.getAttribute('data-id'));
-                this.loadExecutorChat(orderId);
-            });
-        });
-    },
-    
-    loadExecutorChat(orderId) {
-        // Заглушка для чата
-        const chatMessages = document.getElementById('executor-chat-messages');
-        chatMessages.innerHTML = `
-            <div class="chat-info">
-                <i class="fas fa-info-circle"></i>
-                <p>Функция чата будет реализована в следующем обновлении</p>
+                
+                <div style="margin-top: 24px;">
+                    <h4 style="margin-bottom: 12px; color: var(--dark);">Промт от клиента:</h4>
+                    <div style="background: var(--gray-lighter); padding: 20px; border-radius: var(--radius); line-height: 1.6;">
+                        ${order.prompt}
+                    </div>
+                    <div style="margin-top: 12px; font-size: 14px; color: var(--gray); text-align: right;">
+                        ${order.prompt.length} символов
+                    </div>
+                </div>
             </div>
         `;
         
-        // Получаем информацию о заказе
-        const order = DataManager.getOrders().find(o => o.id === orderId);
-        if (order) {
-            const chatHeader = document.getElementById('executor-chat-header');
-            chatHeader.querySelector('.partner-avatar').textContent = order.clientName.charAt(0);
-            chatHeader.querySelector('h4').textContent = order.clientName;
-            chatHeader.querySelector('p').textContent = order.projectName;
-        }
-        
-        // Активируем поле ввода
-        const chatInput = document.getElementById('executor-chat-input');
-        const sendButton = document.getElementById('executor-send-message');
-        
-        chatInput.disabled = true;
-        sendButton.disabled = true;
-        chatInput.placeholder = "Чат будет доступен в следующем обновлении";
+        this.showModal('Детали заказа', html);
     },
     
-    loadClients() {
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
+    // Открыть чат с клиентом
+    openChat(orderId) {
+        const data = this.getData();
+        const order = data.orders.find(o => o.id === orderId);
         
-        // Собираем уникальных клиентов
-        const clientIds = [...new Set(myOrders.map(o => o.clientId))];
-        const clients = DataManager.getClients();
-        const myClients = clients.filter(c => clientIds.includes(c.id));
+        if (!order) return;
         
-        // Обновляем статистику клиентов
-        document.getElementById('total-clients').textContent = myClients.length;
-        document.getElementById('active-clients').textContent = 
-            myClients.filter(c => {
-                const clientOrders = myOrders.filter(o => o.clientId === c.id);
-                return clientOrders.some(o => o.status === 'in_progress');
-            }).length;
-        document.getElementById('repeat-clients').textContent = 
-            myClients.filter(c => {
-                const clientOrders = myOrders.filter(o => o.clientId === c.id);
-                return clientOrders.length > 1;
-            }).length;
-        
-        // Отображаем клиентов
-        const clientsGrid = document.getElementById('clients-grid');
-        
-        if (myClients.length === 0) {
-            clientsGrid.innerHTML = `
-                <div class="empty-clients">
-                    <i class="fas fa-users"></i>
-                    <p>У вас пока нет клиентов</p>
-                </div>
-            `;
-            return;
-        }
-        
-        clientsGrid.innerHTML = myClients.map(client => {
-            const clientOrders = myOrders.filter(o => o.clientId === client.id);
-            const completedOrders = clientOrders.filter(o => o.status === 'completed').length;
-            const totalBudget = clientOrders.reduce((sum, o) => sum + (o.budget || 0), 0);
-            
-            return `
-                <div class="client-card">
-                    <div class="client-avatar">${client.avatar}</div>
-                    <h3>${client.name}</h3>
-                    <p>${client.email}</p>
-                    <div class="client-contact">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>${client.phone}</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fab fa-telegram"></i>
-                            <span>${client.telegram}</span>
-                        </div>
+        const html = `
+            <div style="padding: 20px; max-width: 500px;">
+                <h3 style="margin-bottom: 24px; color: var(--dark);">Чат с клиентом</h3>
+                <p style="margin-bottom: 16px; color: var(--gray);">
+                    Для связи с клиентом <strong>${order.clientName}</strong> используйте:
+                </p>
+                <div style="display: grid; gap: 12px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--gray-lighter); border-radius: var(--radius);">
+                        <span style="font-weight: 600;">📧 Email:</span>
+                        <span>${order.clientEmail}</span>
                     </div>
-                    <div class="client-stats-mini">
-                        <div class="client-stat-mini">
-                            <span class="stat-value">${clientOrders.length}</span>
-                            <span class="stat-label">Заказов</span>
-                        </div>
-                        <div class="client-stat-mini">
-                            <span class="stat-value">${this.formatCurrency(totalBudget)}</span>
-                            <span class="stat-label">Сумма</span>
-                        </div>
-                        <div class="client-stat-mini">
-                            <span class="stat-value">${completedOrders}</span>
-                            <span class="stat-label">Выполнено</span>
-                        </div>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--gray-lighter); border-radius: var(--radius);">
+                        <span style="font-weight: 600;">📱 Телефон:</span>
+                        <span>${order.clientPhone}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--gray-lighter); border-radius: var(--radius);">
+                        <span style="font-weight: 600;">✈️ Telegram:</span>
+                        <span>${order.clientTelegram}</span>
                     </div>
                 </div>
-            `;
-        }).join('');
+                <p style="color: var(--gray); font-size: 14px;">
+                    <em>Интегрированный чат будет добавлен в следующем обновлении</em>
+                </p>
+            </div>
+        `;
         
-        // Обработчики кликов по карточкам клиентов
-        document.querySelectorAll('.client-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (!e.target.closest('.client-contact') && !e.target.closest('.client-stats-mini')) {
-                    // Здесь можно добавить открытие подробной информации о клиенте
-                    this.showNotification('Детальная информация о клиенте будет доступна в следующем обновлении', 'info');
-                }
+        this.showModal('Чат с клиентом', html);
+    },
+    
+    // Показать модальное окно
+    showModal(title, content) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        `;
+        
+        modal.innerHTML = `
+            <div style="background: white; border-radius: var(--radius-lg); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+                <div style="padding: 24px; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--dark);">${title}</h3>
+                    <button id="modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray);">&times;</button>
+                </div>
+                <div>${content}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Обработчик закрытия
+        modal.querySelector('#modal-close').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        // Закрытие по клику на фон
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    },
+    
+    // Настройка навигации
+    setupNavigation() {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.getAttribute('data-section');
+                this.navigateTo(section);
             });
         });
     },
     
-    loadExecutorProfile() {
-        if (!this.currentUser) return;
+    // Навигация по разделам
+    navigateTo(section) {
+        // Обновляем активный пункт меню
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
         
-        // Основная информация
-        document.getElementById('executor-profile-name').textContent = this.currentUser.name;
-        document.getElementById('executor-profile-position').textContent = this.currentUser.position;
-        document.getElementById('executor-profile-avatar').textContent = this.currentUser.avatar;
-        document.getElementById('profile-email').textContent = this.currentUser.email;
-        document.getElementById('profile-phone').textContent = this.currentUser.phone;
-        document.getElementById('profile-telegram').textContent = this.currentUser.telegram;
-        document.getElementById('profile-bio').textContent = this.currentUser.bio;
+        document.querySelector(`[data-section="${section}"]`).classList.add('active');
         
-        // Рейтинг и статистика
-        document.getElementById('profile-rating').textContent = this.currentUser.rating;
-        document.getElementById('profile-projects').textContent = this.currentUser.completedProjects;
-        document.getElementById('profile-experience').textContent = this.currentUser.experience;
+        // Скрываем все разделы
+        document.querySelectorAll('.content-section').forEach(sec => {
+            sec.classList.remove('active');
+        });
         
-        // Навыки
-        const skillTags = document.getElementById('skill-tags');
-        skillTags.innerHTML = this.currentUser.skills
-            .map(skill => `<span class="skill-tag">${skill}</span>`)
-            .join('');
+        // Показываем выбранный раздел
+        document.getElementById(`${section}-section`).classList.add('active');
         
-        // Статистика работы
-        const orders = DataManager.getOrders();
-        const myOrders = orders.filter(o => o.assignedTo === this.currentUser.id);
-        const completedOrders = myOrders.filter(o => o.status === 'completed').length;
+        // Обновляем заголовок
+        this.updatePageTitle(section);
         
-        // Среднее время выполнения (упрощённо)
-        const completedWithDates = myOrders.filter(o => o.status === 'completed' && o.createdDate && o.completedDate);
-        let avgTime = 14; // Значение по умолчанию
-        if (completedWithDates.length > 0) {
-            avgTime = completedWithDates.reduce((sum, o) => {
-                const start = new Date(o.createdDate);
-                const end = new Date(o.completedDate);
-                return sum + Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-            }, 0) / completedWithDates.length;
+        // Загружаем данные для раздела
+        if (section === 'available-orders') {
+            this.loadAvailableOrders();
+        } else if (section === 'my-orders') {
+            this.loadMyOrders();
+        } else if (section === 'dashboard') {
+            this.loadDashboardData();
         }
-        
-        document.getElementById('stat-completed').textContent = completedOrders;
-        document.getElementById('stat-avg-time').textContent = Math.round(avgTime);
-        document.getElementById('stat-satisfaction').textContent = '96%';
     },
     
-    switchView(view) {
-        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`[data-view="${view}"]`).classList.add('active');
+    // Обновление заголовка страницы
+    updatePageTitle(section) {
+        const titles = {
+            'dashboard': 'Панель исполнителя',
+            'available-orders': 'Доступные заказы',
+            'my-orders': 'Мои заказы',
+            'profile': 'Профиль'
+        };
         
-        // Здесь будет логика переключения между доской, списком и календарём
-        this.showNotification(`Режим "${view}" будет доступен в следующем обновлении`, 'info');
+        const subtitles = {
+            'dashboard': 'Обзор и быстрый доступ',
+            'available-orders': 'Новые проекты, ожидающие исполнителя',
+            'my-orders': 'Проекты, которые вы взяли в работу',
+            'profile': 'Ваш профиль исполнителя'
+        };
+        
+        document.getElementById('page-title').textContent = titles[section] || 'Панель';
+        document.getElementById('page-subtitle').textContent = subtitles[section] || '';
     },
     
-    updateUserStatus(status) {
-        // Обновляем статус пользователя
-        this.currentUser.status = status;
-        localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+    // Настройка обработчиков событий
+    setupEventListeners() {
+        // Кнопки быстрого доступа
+        document.getElementById('view-available-btn').addEventListener('click', () => {
+            this.navigateTo('available-orders');
+        });
         
-        this.showNotification(`Статус изменён на "${status}"`, 'success');
-    },
-    
-    searchOrders(query) {
-        const cards = document.querySelectorAll('.order-card');
-        const searchTerm = query.toLowerCase();
+        document.getElementById('view-my-orders-btn').addEventListener('click', () => {
+            this.navigateTo('my-orders');
+        });
         
-        cards.forEach(card => {
-            const title = card.querySelector('.order-title').textContent.toLowerCase();
-            const client = card.querySelector('.order-client').textContent.toLowerCase();
-            const prompt = card.querySelector('.order-prompt-preview p')?.textContent.toLowerCase() || '';
-            
-            if (title.includes(searchTerm) || client.includes(searchTerm) || prompt.includes(searchTerm)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
+        // Смена статуса
+        document.getElementById('status-select').addEventListener('change', (e) => {
+            this.currentUser.status = e.target.value;
+            localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+            this.showNotification(`Статус изменён на "${e.target.value}"`, 'info');
+        });
+        
+        // Выход
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
         });
     },
     
@@ -856,55 +600,30 @@ const ExecutorApp = {
     getStatusText(status) {
         const statuses = {
             'new': 'Новый',
-            'in_progress': 'В работе',
+            'in-progress': 'В работе',
             'review': 'На проверке',
-            'completed': 'Завершён',
-            'paid': 'Оплачен'
+            'completed': 'Завершён'
         };
         return statuses[status] || status;
     },
     
-    getExecutorName(executorId) {
-        const executors = DataManager.getUsers();
-        const executor = executors.find(e => e.id === executorId);
-        return executor ? executor.name : 'Неизвестно';
-    },
-    
-    isPriority(order) {
-        // Заказ приоритетный, если срок менее 7 дней
-        const deadline = new Date(order.createdDate);
-        deadline.setDate(deadline.getDate() + order.deadline);
-        const today = new Date();
-        const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-        return daysLeft < 7;
-    },
-    
-    isUrgent(order) {
-        // Заказ срочный, если срок менее 3 дней
-        const deadline = new Date(order.createdDate);
-        deadline.setDate(deadline.getDate() + order.deadline);
-        const today = new Date();
-        const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-        return daysLeft < 3;
-    },
-    
-    getDaysLeft(order) {
-        const deadline = new Date(order.createdDate);
-        deadline.setDate(deadline.getDate() + order.deadline);
-        const today = new Date();
-        const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-        return daysLeft > 0 ? daysLeft : 0;
+    getTypeText(type) {
+        const types = {
+            'static': 'Статический',
+            'dynamic': 'Динамический',
+            'landing': 'Landing Page',
+            'ecommerce': 'Интернет-магазин'
+        };
+        return types[type] || type;
     },
     
     showNotification(message, type = 'info') {
         const notification = document.getElementById('notification');
-        const text = document.getElementById('notification-text');
-        
-        text.textContent = message;
-        notification.className = `notification ${type} active`;
+        notification.textContent = message;
+        notification.className = `notification ${type} show`;
         
         setTimeout(() => {
-            notification.classList.remove('active');
+            notification.classList.remove('show');
         }, 3000);
     }
 };
