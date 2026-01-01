@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCore — Панель исполнителя</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --dark-light: #334155;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-lighter: #f1f5f9;
+            --white: #ffffff;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--gray-lighter);
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Сайдбар */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: white;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid var(--dark-light);
+        }
+
+        .logo h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .user {
+            padding: 24px;
+            border-bottom: 1px solid var(--dark-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .stats {
+            padding: 24px;
+            border-bottom: 1px solid var(--dark-light);
+        }
+
+        .stat {
+            margin-bottom: 16px;
+        }
+
+        .stat:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav {
+            flex: 1;
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        .nav-item-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 24px;
+            border-top: 1px solid var(--dark-light);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Основной контент */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--white);
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-left p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .current-date {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Карточки */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .welcome-card h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-card p {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--white);
+            color: var(--primary);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Заказы */
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .order-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--gray-light);
+            transition: all 0.2s;
+        }
+
+        .order-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .order-card.priority {
+            border-color: var(--warning);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .order-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .order-client {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-new { background: #dbeafe; color: #1d4ed8; }
+        .status-progress { background: #fef3c7; color: #d97706; }
+        .status-review { background: #fce7f3; color: #be185d; }
+        .status-done { background: #dcfce7; color: #16a34a; }
+
+        .order-budget {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 12px 0;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .order-detail span:first-child {
+            color: var(--gray);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .order-detail span:last-child {
+            font-weight: 600;
+        }
+
+        .order-preview {
+            background: var(--gray-lighter);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 1.4;
+            max-height: 60px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .order-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, var(--gray-lighter));
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-take {
+            flex: 1;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-take:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-view {
+            padding: 10px 16px;
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view:hover {
+            border-color: var(--primary);
+            background: var(--gray-lighter);
+        }
+
+        /* Мои заказы */
+        .my-orders-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .my-order-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--gray-light);
+            transition: all 0.2s;
+        }
+
+        .my-order-card:hover {
+            border-color: var(--primary);
+        }
+
+        .my-order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .my-order-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .status-select {
+            padding: 6px 12px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--white);
+        }
+
+        .my-order-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .my-order-info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .my-order-info-label {
+            color: var(--gray);
+        }
+
+        .my-order-info-value {
+            font-weight: 600;
+        }
+
+        .my-order-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-small.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-small.secondary {
+            background: var(--gray-lighter);
+            color: var(--dark);
+            border: 1px solid var(--gray-light);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-lighter);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: var(--gray);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 600;
+        }
+
+        .prompt-content {
+            background: var(--gray-lighter);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .prompt-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Уведомление */
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--dark);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .notification.active {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+                overflow: hidden;
+            }
+            
+            .logo h2,
+            .logo p,
+            .user-info,
+            .stats,
+            .nav-item span,
+            .badge {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 16px;
+            }
+            
+            .main {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                flex-direction: row;
+                padding: 0;
+            }
+            
+            .logo {
+                display: none;
+            }
+            
+            .user {
+                display: none;
+            }
+            
+            .nav {
+                display: flex;
+                padding: 0;
+                flex: 1;
+            }
+            
+            .nav-item {
+                flex-direction: column;
+                padding: 12px;
+                font-size: 12px;
+                flex: 1;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-item.active {
+                border-left: none;
+                border-bottom-color: var(--primary);
+            }
+            
+            .sidebar-footer {
+                display: none;
+            }
+            
+            .main {
+                margin-left: 0;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px;
+            }
+            
+            .orders-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
+            
+            .order-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Сайдбар -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>SiteCore</h2>
+            <p>Панель исполнителя</p>
+        </div>
+
+        <div class="user">
+            <div class="user-avatar" id="userAvatar">И</div>
+            <div class="user-info">
+                <h3 id="userName">Исполнитель</h3>
+                <p id="userRole">Разработчик</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Доступные заказы</div>
+                <div class="stat-value" id="availableOrders">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Мои заказы</div>
+                <div class="stat-value" id="myOrders">0</div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <div class="nav-item active" data-page="dashboard">
+                <span class="nav-item-icon">🏠</span>
+                <span>Панель</span>
+            </div>
+            <div class="nav-item" data-page="available">
+                <span class="nav-item-icon">📋</span>
+                <span>Доступные заказы</span>
+                <span class="badge" id="availableBadge">0</span>
+            </div>
+            <div class="nav-item" data-page="my-orders">
+                <span class="nav-item-icon">👨‍💻</span>
+                <span>Мои заказы</span>
+                <span class="badge" id="myOrdersBadge">0</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <span class="nav-item-icon">👤</span>
+                <span>Профиль</span>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="logoutBtn">
+                <span>🚪</span>
+                <span>Выйти</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="main">
+        <header class="header">
+            <div class="header-left">
+                <h1 id="pageTitle">Панель исполнителя</h1>
+                <p id="pageSubtitle">Добро пожаловать</p>
+            </div>
+            <div class="current-date" id="currentDate"></div>
+        </header>
+
+        <div class="content">
+            <!-- Главная -->
+            <div id="dashboardPage" class="page active">
+                <div class="welcome-card card">
+                    <h2>Привет, <span id="welcomeName">Исполнитель</span>!</h2>
+                    <p>Проверьте доступные заказы и начните работу</p>
+                    <button class="btn" id="viewAvailableBtn">Смотреть заказы</button>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 16px;">Быстрый доступ</h3>
+                    <div class="orders-grid">
+                        <div class="order-card" style="cursor: default;">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-title">Доступные заказы</div>
+                                    <div class="order-client">Новые проекты ждут вас</div>
+                                </div>
+                                <div class="order-status status-new">Новые</div>
+                            </div>
+                            <div class="order-budget" id="quickAvailable">0 ₽</div>
+                            <div class="order-details">
+                                <div class="order-detail">
+                                    <span>Количество</span>
+                                    <span id="quickAvailableCount">0</span>
+                                </div>
+                                <div class="order-detail">
+                                    <span>Средний бюджет</span>
+                                    <span id="quickAvailableAvg">0 ₽</span>
+                                </div>
+                            </div>
+                            <div class="order-actions">
+                                <button class="btn-take" id="takeAvailableBtn">Взять заказ</button>
+                            </div>
+                        </div>
+
+                        <div class="order-card" style="cursor: default;">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-title">Мои заказы</div>
+                                    <div class="order-client">Текущие проекты</div>
+                                </div>
+                                <div class="order-status status-progress">В работе</div>
+                            </div>
+                            <div class="order-budget" id="quickMyOrders">0 ₽</div>
+                            <div class="order-details">
+                                <div class="order-detail">
+                                    <span>В работе</span>
+                                    <span id="quickInProgress">0</span>
+                                </div>
+                                <div class="order-detail">
+                                    <span>На проверке</span>
+                                    <span id="quickInReview">0</span>
+                                </div>
+                            </div>
+                            <div class="order-actions">
+                                <button class="btn-view" id="viewMyOrdersBtn">Мои заказы</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Доступные заказы -->
+            <div id="availablePage" class="page">
+                <div class="orders-header">
+                    <h2 style="font-size: 24px; font-weight: 700;">Доступные заказы</h2>
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="static">Статические</button>
+                        <button class="filter-btn" data-filter="dynamic">Динамические</button>
+                        <button class="filter-btn" data-filter="landing">Landing</button>
+                        <button class="filter-btn" data-filter="shop">Магазины</button>
+                    </div>
+                </div>
+
+                <div class="orders-grid" id="availableOrdersList">
+                    <!-- Заказы будут здесь -->
+                </div>
+            </div>
+
+            <!-- Мои заказы -->
+            <div id="myOrdersPage" class="page">
+                <div class="orders-header">
+                    <h2 style="font-size: 24px; font-weight: 700;">Мои заказы</h2>
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="progress">В работе</button>
+                        <button class="filter-btn" data-filter="review">На проверке</button>
+                        <button class="filter-btn" data-filter="done">Завершены</button>
+                    </div>
+                </div>
+
+                <div class="my-orders-list" id="myOrdersList">
+                    <!-- Мои заказы будут здесь -->
+                </div>
+            </div>
+
+            <!-- Профиль -->
+            <div id="profilePage" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 8px;">Мой профиль</h2>
+                    <p style="color: var(--gray); margin-bottom: 24px;">Информация об исполнителе</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px;">
+                        <div style="text-align: center;">
+                            <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 700; color: white; margin: 0 auto 16px;" id="profileAvatar">И</div>
+                            <h3 id="profileName">Исполнитель</h3>
+                            <p style="color: var(--gray); margin-bottom: 24px;" id="profileSpecialization">Разработчик</p>
+                            
+                            <div style="display: grid; gap: 12px;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;" id="profileCompleted">0</div>
+                                    <div style="font-size: 13px; color: var(--gray);">Выполнено</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;" id="profileRevenue">0 ₽</div>
+                                    <div style="font-size: 13px; color: var(--gray);">Заработано</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style="margin-bottom: 16px;">Статистика работы</h3>
+                            <div style="display: grid; gap: 16px;">
+                                <div>
+                                    <div style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">Всего заказов</div>
+                                    <div style="font-weight: 600;" id="statsTotal">0</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">В работе</div>
+                                    <div style="font-weight: 600;" id="statsInProgress">0</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">Завершено</div>
+                                    <div style="font-weight: 600;" id="statsCompleted">0</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">Средний бюджет</div>
+                                    <div style="font-weight: 600;" id="statsAvgBudget">0 ₽</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальное окно заказа -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalOrderTitle">Детали заказа</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalOrderBody">
+                <!-- Контент загружается через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <script>
+        // Загрузка данных
+        const user = JSON.parse(localStorage.getItem('current_user') || 'null');
+        if (!user || user.role !== 'executor') {
+            window.location.href = 'index.html';
+        }
+
+        // Обновление UI
+        function updateUI() {
+            // Обновляем информацию пользователя
+            document.getElementById('userAvatar').textContent = user.avatar;
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userRole').textContent = user.specialization;
+            document.getElementById('welcomeName').textContent = user.name;
+            
+            document.getElementById('profileAvatar').textContent = user.avatar;
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileSpecialization').textContent = user.specialization;
+            
+            // Обновляем дату
+            document.getElementById('currentDate').textContent = 
+                new Date().toLocaleDateString('ru-RU', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            
+            // Загружаем заказы
+            loadAvailableOrders();
+            loadMyOrders();
+            updateStats();
+        }
+
+        // Загрузка доступных заказов
+        function loadAvailableOrders(filter = 'all') {
+            const data = JSON.parse(localStorage.getItem('sitecore_data') || '{"orders":[]}');
+            const availableOrders = data.orders.filter(order => 
+                order.status === 'new' && !order.assignedTo
+            );
+            
+            // Фильтрация по типу
+            let filteredOrders = availableOrders;
+            if (filter !== 'all') {
+                filteredOrders = availableOrders.filter(order => order.type === filter);
+            }
+            
+            // Обновляем счетчики
+            document.getElementById('availableOrders').textContent = availableOrders.length;
+            document.getElementById('availableBadge').textContent = availableOrders.length;
+            
+            // Обновляем быстрые данные
+            const totalBudget = availableOrders.reduce((sum, order) => sum + order.budget, 0);
+            document.getElementById('quickAvailable').textContent = formatCurrency(totalBudget);
+            document.getElementById('quickAvailableCount').textContent = availableOrders.length;
+            document.getElementById('quickAvailableAvg').textContent = 
+                availableOrders.length > 0 ? formatCurrency(totalBudget / availableOrders.length) : '0 ₽';
+            
+            // Обновляем список
+            const ordersList = document.getElementById('availableOrdersList');
+            
+            if (filteredOrders.length === 0) {
+                ordersList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--gray);">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
+                        <p>Нет доступных заказов</p>
+                    </div>
+                `;
+            } else {
+                ordersList.innerHTML = filteredOrders.map(order => `
+                    <div class="order-card ${isPriority(order) ? 'priority' : ''}" data-id="${order.id}">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-title">${order.title}</div>
+                                <div class="order-client">${order.clientName}</div>
+                            </div>
+                            <div class="order-status status-new">Новый</div>
+                        </div>
+                        
+                        <div class="order-budget">${formatCurrency(order.budget)}</div>
+                        
+                        <div class="order-details">
+                            <div class="order-detail">
+                                <span>Тип</span>
+                                <span>${getTypeText(order.type)}</span>
+                            </div>
+                            <div class="order-detail">
+                                <span>Срок</span>
+                                <span>${order.deadline} дней</span>
+                            </div>
+                            <div class="order-detail">
+                                <span>Телефон</span>
+                                <span>${order.clientPhone}</span>
+                            </div>
+                            <div class="order-detail">
+                                <span>Telegram</span>
+                                <span>${order.clientTelegram}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="order-preview">
+                            ${order.prompt.substring(0, 100)}...
+                        </div>
+                        
+                        <div class="order-actions">
+                            <button class="btn-take" onclick="takeOrder(${order.id})">Взять в работу</button>
+                            <button class="btn-view" onclick="viewOrder(${order.id})">Подробнее</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Загрузка моих заказов
+        function loadMyOrders(filter = 'all') {
+            const data = JSON.parse(localStorage.getItem('sitecore_data') || '{"orders":[]}');
+            const myOrders = data.orders.filter(order => order.assignedTo === user.id);
+            
+            // Фильтрация по статусу
+            let filteredOrders = myOrders;
+            if (filter !== 'all') {
+                filteredOrders = myOrders.filter(order => order.status === filter);
+            }
+            
+            // Обновляем счетчики
+            document.getElementById('myOrders').textContent = myOrders.length;
+            document.getElementById('myOrdersBadge').textContent = myOrders.length;
+            
+            // Обновляем быстрые данные
+            const inProgress = myOrders.filter(o => o.status === 'progress').length;
+            const inReview = myOrders.filter(o => o.status === 'review').length;
+            const totalBudget = myOrders.reduce((sum, order) => sum + order.budget, 0);
+            
+            document.getElementById('quickMyOrders').textContent = formatCurrency(totalBudget);
+            document.getElementById('quickInProgress').textContent = inProgress;
+            document.getElementById('quickInReview').textContent = inReview;
+            
+            // Обновляем список
+            const ordersList = document.getElementById('myOrdersList');
+            
+            if (filteredOrders.length === 0) {
+                ordersList.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: var(--gray);">
+                        <div style="font-size: 48px; margin-bottom: 16px;">👨‍💻</div>
+                        <p>У вас пока нет заказов</p>
+                    </div>
+                `;
+            } else {
+                ordersList.innerHTML = filteredOrders.map(order => `
+                    <div class="my-order-card" data-id="${order.id}">
+                        <div class="my-order-header">
+                            <div class="my-order-title">${order.title}</div>
+                            <select class="status-select" data-id="${order.id}">
+                                <option value="progress" ${order.status === 'progress' ? 'selected' : ''}>В работе</option>
+                                <option value="review" ${order.status === 'review' ? 'selected' : ''}>На проверке</option>
+                                <option value="done" ${order.status === 'done' ? 'selected' : ''}>Завершен</option>
+                            </select>
+                        </div>
+                        
+                        <div class="my-order-info">
+                            <div class="my-order-info-item">
+                                <span class="my-order-info-label">Клиент:</span>
+                                <span class="my-order-info-value">${order.clientName}</span>
+                            </div>
+                            <div class="my-order-info-item">
+                                <span class="my-order-info-label">Бюджет:</span>
+                                <span class="my-order-info-value">${formatCurrency(order.budget)}</span>
+                            </div>
+                            <div class="my-order-info-item">
+                                <span class="my-order-info-label">Срок:</span>
+                                <span class="my-order-info-value">${order.deadline} дней</span>
+                            </div>
+                            <div class="my-order-info-item">
+                                <span class="my-order-info-label">Создан:</span>
+                                <span class="my-order-info-value">${new Date(order.createdAt).toLocaleDateString('ru-RU')}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="my-order-actions">
+                            <button class="btn-small primary" onclick="viewOrder(${order.id})">Подробнее</button>
+                            <button class="btn-small secondary" onclick="contactClient(${order.id})">Контакты клиента</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Добавляем обработчики изменения статуса
+                document.querySelectorAll('.status-select').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const orderId = parseInt(this.getAttribute('data-id'));
+                        const newStatus = this.value;
+                        updateOrderStatus(orderId, newStatus);
+                    });
+                });
+            }
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            const data = JSON.parse(localStorage.getItem('sitecore_data') || '{"orders":[]}');
+            const myOrders = data.orders.filter(order => order.assignedTo === user.id);
+            
+            const completed = myOrders.filter(o => o.status === 'done').length;
+            const inProgress = myOrders.filter(o => o.status === 'progress').length;
+            const totalBudget = myOrders.reduce((sum, o) => sum + o.budget, 0);
+            const completedBudget = myOrders
+                .filter(o => o.status === 'done')
+                .reduce((sum, o) => sum + o.budget, 0);
+            
+            document.getElementById('profileCompleted').textContent = completed;
+            document.getElementById('profileRevenue').textContent = formatCurrency(completedBudget);
+            document.getElementById('statsTotal').textContent = myOrders.length;
+            document.getElementById('statsInProgress').textContent = inProgress;
+            document.getElementById('statsCompleted').textContent = completed;
+            document.getElementById('statsAvgBudget').textContent = 
+                myOrders.length > 0 ? formatCurrency(totalBudget / myOrders.length) : '0 ₽';
+        }
+
+        // Взять заказ в работу
+        function takeOrder(orderId) {
+            const data = JSON.parse(localStorage.getItem('sitecore_data'));
+            const orderIndex = data.orders.findIndex(o => o.id === orderId);
+            
+            if (orderIndex === -1) {
+                showNotification('Заказ не найден', 'error');
+                return;
+            }
+            
+            data.orders[orderIndex].assignedTo = user.id;
+            data.orders[orderIndex].status = 'progress';
+            data.orders[orderIndex].updatedAt = new Date().toISOString();
+            
+            localStorage.setItem('sitecore_data', JSON.stringify(data));
+            
+            showNotification('Заказ взят в работу!', 'success');
+            
+            // Обновляем UI
+            loadAvailableOrders();
+            loadMyOrders();
+            updateStats();
+        }
+
+        // Обновить статус заказа
+        function updateOrderStatus(orderId, newStatus) {
+            const data = JSON.parse(localStorage.getItem('sitecore_data'));
+            const orderIndex = data.orders.findIndex(o => o.id === orderId);
+            
+            if (orderIndex === -1) {
+                showNotification('Заказ не найден', 'error');
+                return;
+            }
+            
+            data.orders[orderIndex].status = newStatus;
+            data.orders[orderIndex].updatedAt = new Date().toISOString();
+            
+            localStorage.setItem('sitecore_data', JSON.stringify(data));
+            
+            showNotification('Статус заказа обновлен', 'success');
+            
+            // Обновляем UI
+            loadMyOrders();
+            updateStats();
+        }
+
+        // Просмотр заказа
+        function viewOrder(orderId) {
+            const data = JSON.parse(localStorage.getItem('sitecore_data'));
+            const order = data.orders.find(o => o.id === orderId);
+            
+            if (!order) return;
+            
+            document.getElementById('modalOrderTitle').textContent = order.title;
+            document.getElementById('modalOrderBody').innerHTML = `
+                <div class="order-info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Клиент</div>
+                        <div class="info-value">${order.clientName}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">${order.clientEmail}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Телефон</div>
+                        <div class="info-value">${order.clientPhone}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Telegram</div>
+                        <div class="info-value">${order.clientTelegram}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Тип сайта</div>
+                        <div class="info-value">${getTypeText(order.type)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Бюджет</div>
+                        <div class="info-value">${formatCurrency(order.budget)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Срок</div>
+                        <div class="info-value">${order.deadline} дней</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Статус</div>
+                        <div class="info-value">
+                            <span class="order-status status-${order.status}">
+                                ${getStatusText(order.status)}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Дата создания</div>
+                        <div class="info-value">${new Date(order.createdAt).toLocaleDateString('ru-RU')}</div>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 24px; margin-bottom: 12px;">Промт от клиента</h4>
+                <div class="prompt-content">${order.prompt}</div>
+                <div class="prompt-stats">
+                    <span>${order.prompt.length} символов</span>
+                    <span>Время чтения: ${Math.ceil(order.prompt.length / 1200)} мин</span>
+                </div>
+                
+                ${order.assignedTo === user.id ? `
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--gray-light);">
+                    <h4 style="margin-bottom: 12px;">Управление заказом</h4>
+                    <div style="display: flex; gap: 12px;">
+                        <select id="modalStatusSelect" style="flex: 1; padding: 10px; border: 1px solid var(--gray-light); border-radius: var(--radius);">
+                            <option value="progress" ${order.status === 'progress' ? 'selected' : ''}>В работе</option>
+                            <option value="review" ${order.status === 'review' ? 'selected' : ''}>На проверке</option>
+                            <option value="done" ${order.status === 'done' ? 'selected' : ''}>Завершен</option>
+                        </select>
+                        <button class="btn-take" onclick="updateOrderStatus(${order.id}, document.getElementById('modalStatusSelect').value)">Обновить статус</button>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('orderModal').classList.add('active');
+        }
+
+        // Контакты клиента
+        function contactClient(orderId) {
+            const data = JSON.parse(localStorage.getItem('sitecore_data'));
+            const order = data.orders.find(o => o.id === orderId);
+            
+            if (!order) return;
+            
+            const html = `
+                <div style="padding: 20px; max-width: 500px;">
+                    <h3 style="margin-bottom: 24px; color: var(--dark);">Контакты клиента</h3>
+                    <p style="margin-bottom: 16px; color: var(--gray);">
+                        Для связи с клиентом <strong>${order.clientName}</strong>:
+                    </p>
+                    <div style="display: grid; gap: 12px; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--gray-lighter); border-radius: var(--radius);">
+                            <span style="font-weight: 600;">📧 Email:</span>
+                            <span>${order.clientEmail}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--gray-lighter); border-radius: var(--radius);">
+                            <span style="font-weight: 600;">📱 Телефон:</span>
+                            <span>${order.clientPhone}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--gray-lighter); border-radius: var(--radius);">
+                            <span style="font-weight: 600;">✈️ Telegram:</span>
+                            <span>${order.clientTelegram}</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--gray); font-size: 14px;">
+                        <em>Свяжитесь с клиентом для уточнения деталей по заказу</em>
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('modalOrderTitle').textContent = 'Контакты клиента';
+            document.getElementById('modalOrderBody').innerHTML = html;
+            document.getElementById('orderModal').classList.add('active');
+        }
+
+        // Навигация
+        function navigateTo(page) {
+            // Обновляем активный пункт меню
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === page) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Показываем нужную страницу
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${page}Page`).classList.add('active');
+            
+            // Обновляем заголовок
+            const titles = {
+                'dashboard': 'Панель исполнителя',
+                'available': 'Доступные заказы',
+                'my-orders': 'Мои заказы',
+                'profile': 'Профиль'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[page];
+        }
+
+        // Вспомогательные функции
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency',
+                currency: 'RUB',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function getStatusText(status) {
+            const statuses = {
+                'new': 'Новый',
+                'progress': 'В работе',
+                'review': 'На проверке',
+                'done': 'Завершен'
+            };
+            return statuses[status] || status;
+        }
+
+        function getTypeText(type) {
+            const types = {
+                'static': 'Статический сайт',
+                'dynamic': 'Динамический сайт',
+                'landing': 'Landing Page',
+                'shop': 'Интернет-магазин'
+            };
+            return types[type] || type;
+        }
+
+        function isPriority(order) {
+            // Заказ приоритетный, если срок менее 7 дней
+            const deadline = new Date(order.createdAt);
+            deadline.setDate(deadline.getDate() + order.deadline);
+            const today = new Date();
+            const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            return daysLeft < 7;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} active`;
+            
+            setTimeout(() => {
+                notification.classList.remove('active');
+            }, 3000);
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUI();
+            
+            // Навигация
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    navigateTo(page);
+                });
+            });
+            
+            // Кнопки быстрого доступа
+            document.getElementById('viewAvailableBtn').addEventListener('click', () => navigateTo('available'));
+            document.getElementById('takeAvailableBtn').addEventListener('click', () => navigateTo('available'));
+            document.getElementById('viewMyOrdersBtn').addEventListener('click', () => navigateTo('my-orders'));
+            
+            // Фильтры доступных заказов
+            document.querySelectorAll('#availablePage .filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#availablePage .filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.getAttribute('data-filter');
+                    loadAvailableOrders(filter);
+                });
+            });
+            
+            // Фильтры моих заказов
+            document.querySelectorAll('#myOrdersPage .filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#myOrdersPage .filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.getAttribute('data-filter');
+                    loadMyOrders(filter);
+                });
+            });
+            
+            // Закрытие модального окна
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('orderModal').classList.remove('active');
+            });
+            
+            // Выход
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('current_user');
+                window.location.href = 'index.html';
+            });
+            
+            // Закрытие модального окна по клику на фон
+            document.getElementById('orderModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
