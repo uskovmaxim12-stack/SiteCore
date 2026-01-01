@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCore | Панель исполнителя</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="executor-style.css">
+</head>
+<body>
+    <div class="executor-dashboard">
+        <!-- Боковая панель -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-code-branch"></i>
+                    <h2>SiteCore</h2>
+                </div>
+                <p class="role-badge">Исполнитель</p>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar" id="executor-avatar">А</div>
+                <div class="user-info">
+                    <h3 id="executor-name">Александр</h3>
+                    <p id="executor-position">Старший разработчик</p>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span id="executor-rating">4.8</span>
+                        <span class="completed-projects" id="executor-projects">47 проектов</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <i class="fas fa-tasks"></i>
+                    <div>
+                        <span class="stat-value" id="active-tasks">3</span>
+                        <span class="stat-label">Активные</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <span class="stat-value" id="deadline-tasks">2</span>
+                        <span class="stat-label">С дедлайном</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Панель</span>
+                </a>
+                <a href="#" class="nav-item" data-section="all-orders">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Все заказы</span>
+                    <span class="badge" id="all-orders-count">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="my-orders">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Мои заказы</span>
+                    <span class="badge" id="my-orders-count">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="messages">
+                    <i class="fas fa-comments"></i>
+                    <span>Сообщения</span>
+                    <span class="badge" id="messages-count">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="clients">
+                    <i class="fas fa-users"></i>
+                    <span>Клиенты</span>
+                </a>
+                <a href="#" class="nav-item" data-section="profile">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Профиль</span>
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-selector">
+                    <span>Статус:</span>
+                    <select id="status-select">
+                        <option value="online" selected>Online</option>
+                        <option value="away">Отошёл</option>
+                        <option value="busy">Занят</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </div>
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="page-title">Панель исполнителя</h1>
+                    <p id="page-subtitle">Добро пожаловать в рабочую панель SiteCore</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-orders" placeholder="Поиск заказов...">
+                    </div>
+                    <div class="notification-bell" id="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">5</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Контейнер контента -->
+            <div class="content-container">
+                <!-- Дашборд -->
+                <section id="dashboard-section" class="content-section active">
+                    <div class="dashboard-grid">
+                        <div class="welcome-card">
+                            <div class="welcome-content">
+                                <h2>Привет, <span id="welcome-name">Александр</span>!</h2>
+                                <p>Сегодня у вас <span id="today-tasks">3 задачи</span> на выполнение</p>
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Среднее время выполнения: <strong>12 дней</strong></span>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <i class="fas fa-star"></i>
+                                        <span>Рейтинг: <strong>4.8/5.0</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="welcome-illustration">
+                                <i class="fas fa-code"></i>
+                            </div>
+                        </div>
+
+                        <div class="priority-orders">
+                            <h3>Приоритетные задачи</h3>
+                            <div class="priority-list" id="priority-list">
+                                <!-- Приоритетные заказы загружаются через JS -->
+                            </div>
+                        </div>
+
+                        <div class="stats-overview">
+                            <h3>Статистика за месяц</h3>
+                            <div class="stats-cards">
+                                <div class="stat-card">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="month-completed">8</span>
+                                        <span class="stat-label">Выполнено</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="month-revenue">240к ₽</span>
+                                        <span class="stat-label">Заработано</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <i class="fas fa-clock"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="avg-time">12 дн.</span>
+                                        <span class="stat-label">Среднее время</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <i class="fas fa-smile"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="satisfaction">96%</span>
+                                        <span class="stat-label">Довольных клиентов</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="recent-activity">
+                            <h3>Последняя активность</h3>
+                            <div class="activity-list" id="activity-list">
+                                <!-- Активность загружается через JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Все заказы -->
+                <section id="all-orders-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Все доступные заказы</h2>
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label>Статус:</label>
+                                <select id="filter-status">
+                                    <option value="all">Все</option>
+                                    <option value="new">Новые</option>
+                                    <option value="in_progress">В работе</option>
+                                    <option value="review">На проверке</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Тип:</label>
+                                <select id="filter-type">
+                                    <option value="all">Все</option>
+                                    <option value="static">Статические</option>
+                                    <option value="dynamic">Динамические</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Бюджет:</label>
+                                <select id="filter-budget">
+                                    <option value="all">Любой</option>
+                                    <option value="low">До 50к</option>
+                                    <option value="medium">50к-150к</option>
+                                    <option value="high">150к+</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="orders-grid" id="all-orders-grid">
+                        <!-- Все заказы загружаются через JS -->
+                    </div>
+                </section>
+
+                <!-- Мои заказы -->
+                <section id="my-orders-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Мои заказы</h2>
+                        <div class="view-tabs">
+                            <button class="view-btn active" data-view="board">
+                                <i class="fas fa-th-large"></i> Доска
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i> Список
+                            </button>
+                            <button class="view-btn" data-view="calendar">
+                                <i class="fas fa-calendar"></i> Календарь
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Доска задач -->
+                    <div class="kanban-board" id="kanban-board">
+                        <div class="kanban-column">
+                            <div class="column-header">
+                                <h4>Новые</h4>
+                                <span class="column-count" id="new-count">0</span>
+                            </div>
+                            <div class="column-body" id="new-column">
+                                <!-- Карточки заказов -->
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="column-header">
+                                <h4>В работе</h4>
+                                <span class="column-count" id="progress-count">0</span>
+                            </div>
+                            <div class="column-body" id="progress-column">
+                                <!-- Карточки заказов -->
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="column-header">
+                                <h4>На проверке</h4>
+                                <span class="column-count" id="review-count">0</span>
+                            </div>
+                            <div class="column-body" id="review-column">
+                                <!-- Карточки заказов -->
+                            </div>
+                        </div>
+                        <div class="kanban-column">
+                            <div class="column-header">
+                                <h4>Завершённые</h4>
+                                <span class="column-count" id="completed-count">0</span>
+                            </div>
+                            <div class="column-body" id="completed-column">
+                                <!-- Карточки заказов -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Сообщения -->
+                <section id="messages-section" class="content-section">
+                    <div class="messages-container">
+                        <div class="conversations-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Сообщения</h3>
+                                <button class="btn-small" id="new-conversation">
+                                    <i class="fas fa-plus"></i> Новый
+                                </button>
+                            </div>
+                            <div class="search-conversations">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Поиск диалогов...">
+                            </div>
+                            <div class="conversations-list" id="executor-conversations">
+                                <!-- Диалоги загружаются через JS -->
+                            </div>
+                        </div>
+                        <div class="chat-main">
+                            <div class="chat-header" id="executor-chat-header">
+                                <div class="chat-partner">
+                                    <div class="partner-avatar">К</div>
+                                    <div class="partner-info">
+                                        <h4>Выберите диалог</h4>
+                                        <p>Для начала общения</p>
+                                    </div>
+                                </div>
+                                <div class="chat-actions">
+                                    <button class="btn-icon" title="Информация о клиенте">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Прикрепить файл">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chat-messages" id="executor-chat-messages">
+                                <div class="no-chat-selected">
+                                    <i class="fas fa-comments"></i>
+                                    <p>Выберите диалог из списка слева</p>
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <div class="input-actions">
+                                    <button class="btn-icon" title="Прикрепить файл">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Эмодзи">
+                                        <i class="fas fa-smile"></i>
+                                    </button>
+                                </div>
+                                <textarea id="executor-chat-input" placeholder="Введите сообщение..." disabled></textarea>
+                                <button id="executor-send-message" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Клиенты -->
+                <section id="clients-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Мои клиенты</h2>
+                        <div class="client-stats">
+                            <div class="client-stat">
+                                <span class="stat-value" id="total-clients">12</span>
+                                <span class="stat-label">Всего клиентов</span>
+                            </div>
+                            <div class="client-stat">
+                                <span class="stat-value" id="active-clients">8</span>
+                                <span class="stat-label">Активных</span>
+                            </div>
+                            <div class="client-stat">
+                                <span class="stat-value" id="repeat-clients">5</span>
+                                <span class="stat-label">Повторных</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clients-grid" id="clients-grid">
+                        <!-- Клиенты загружаются через JS -->
+                    </div>
+                </section>
+
+                <!-- Профиль -->
+                <section id="profile-section" class="content-section">
+                    <div class="profile-container">
+                        <div class="profile-header">
+                            <h2>Профиль исполнителя</h2>
+                            <button class="btn-primary" id="edit-profile">
+                                <i class="fas fa-edit"></i> Редактировать профиль
+                            </button>
+                        </div>
+
+                        <div class="profile-content">
+                            <div class="profile-sidebar">
+                                <div class="avatar-upload">
+                                    <div class="avatar-large" id="executor-profile-avatar">А</div>
+                                    <button class="upload-btn" id="upload-avatar">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                </div>
+                                <h3 id="executor-profile-name">Александр</h3>
+                                <p class="profile-position" id="executor-profile-position">Старший разработчик</p>
+                                
+                                <div class="profile-metrics">
+                                    <div class="metric">
+                                        <i class="fas fa-star"></i>
+                                        <div>
+                                            <span class="metric-value" id="profile-rating">4.8</span>
+                                            <span class="metric-label">Рейтинг</span>
+                                        </div>
+                                    </div>
+                                    <div class="metric">
+                                        <i class="fas fa-project-diagram"></i>
+                                        <div>
+                                            <span class="metric-value" id="profile-projects">47</span>
+                                            <span class="metric-label">Проектов</span>
+                                        </div>
+                                    </div>
+                                    <div class="metric">
+                                        <i class="fas fa-clock"></i>
+                                        <div>
+                                            <span class="metric-value" id="profile-experience">5 лет</span>
+                                            <span class="metric-label">Опыт</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="skills-list">
+                                    <h4>Навыки</h4>
+                                    <div class="skill-tags" id="skill-tags">
+                                        <span class="skill-tag">HTML/CSS</span>
+                                        <span class="skill-tag">JavaScript</span>
+                                        <span class="skill-tag">React</span>
+                                        <span class="skill-tag">Node.js</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="profile-details">
+                                <div class="details-section">
+                                    <h4>Контактная информация</h4>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Email:</span>
+                                            <span class="detail-value" id="profile-email">alex@sitecore.ru</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Телефон:</span>
+                                            <span class="detail-value" id="profile-phone">+7 (999) 123-45-67</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Telegram:</span>
+                                            <span class="detail-value" id="profile-telegram">@alex_dev</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="details-section">
+                                    <h4>О себе</h4>
+                                    <p id="profile-bio">Специализируюсь на создании сложных веб-приложений и динамических сайтов.</p>
+                                </div>
+
+                                <div class="details-section">
+                                    <h4>Статистика работы</h4>
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <span class="stat-number" id="stat-completed">42</span>
+                                            <span class="stat-description">Выполненных проекта</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-number" id="stat-avg-time">12</span>
+                                            <span class="stat-description">Среднее время выполнения (дней)</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-number" id="stat-satisfaction">96%</span>
+                                            <span class="stat-description">Довольных клиентов</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="details-section">
+                                    <h4>Настройки уведомлений</h4>
+                                    <div class="settings-grid">
+                                        <div class="setting-item">
+                                            <span>Новые заказы</span>
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <span>Сообщения от клиентов</span>
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <span>Напоминания о дедлайнах</span>
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <span>Еженедельная статистика</span>
+                                            <label class="switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Модальное окно заказа -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content wide">
+            <div class="modal-header">
+                <h3 id="modal-order-title">Детали заказа</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="order-details-grid">
+                    <div class="order-info">
+                        <h4>Информация о заказе</h4>
+                        <div class="info-grid" id="order-info-grid">
+                            <!-- Информация о заказе загружается через JS -->
+                        </div>
+                    </div>
+                    <div class="order-client">
+                        <h4>Информация о клиенте</h4>
+                        <div class="client-card" id="client-card">
+                            <!-- Информация о клиенте загружается через JS -->
+                        </div>
+                    </div>
+                    <div class="order-prompt">
+                        <h4>Промт от клиента</h4>
+                        <div class="prompt-content" id="modal-prompt-content">
+                            <!-- Промт загружается через JS -->
+                        </div>
+                        <div class="prompt-stats">
+                            <span id="prompt-length">0 символов</span>
+                            <span id="prompt-read-time">Время чтения: 0 мин</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions" id="modal-actions">
+                    <!-- Кнопки действий загружаются через JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно клиента -->
+    <div class="modal" id="client-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="client-modal-title">Информация о клиенте</h3>
+                <button class="modal-close" id="client-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="client-modal-body">
+                <!-- Информация о клиенте загружается через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="executor.js"></script>
+</body>
+</html>

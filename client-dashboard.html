@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCore | Панель клиента</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="client-style.css">
+</head>
+<body>
+    <div class="client-dashboard">
+        <!-- Боковая панель -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-code-branch"></i>
+                    <h2>SiteCore</h2>
+                </div>
+                <p class="role-badge">Клиент</p>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar" id="user-avatar">К</div>
+                <div class="user-info">
+                    <h3 id="user-name">Иван Иванов</h3>
+                    <p id="user-email">ivan@example.com</p>
+                </div>
+                <div class="status-indicator online"></div>
+            </div>
+
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Главная</span>
+                </a>
+                <a href="#" class="nav-item" data-section="orders">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Мои заказы</span>
+                    <span class="badge" id="orders-count">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="new-order">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Новый заказ</span>
+                </a>
+                <a href="#" class="nav-item" data-section="messages">
+                    <i class="fas fa-comments"></i>
+                    <span>Сообщения</span>
+                    <span class="badge" id="messages-count">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="profile">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Профиль</span>
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="page-title">Главная панель</h1>
+                    <p id="page-subtitle">Добро пожаловать в SiteCore Platform</p>
+                </div>
+                <div class="header-right">
+                    <div class="notification-bell" id="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                    <div class="current-date" id="current-date"></div>
+                </div>
+            </header>
+
+            <!-- Контейнер контента -->
+            <div class="content-container">
+                <!-- Главная страница -->
+                <section id="dashboard-section" class="content-section active">
+                    <div class="welcome-card">
+                        <div class="welcome-content">
+                            <h2>Добро пожаловать, <span id="welcome-name">Иван</span>!</h2>
+                            <p>SiteCore помогает превратить ваши идеи в современные и функциональные сайты.</p>
+                            <button class="btn-primary" id="create-first-order">
+                                <i class="fas fa-plus"></i> Создать первый заказ
+                            </button>
+                        </div>
+                        <div class="welcome-illustration">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon active">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Активные заказы</h4>
+                                <p class="stat-value" id="active-orders-count">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon completed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Завершённые</h4>
+                                <p class="stat-value" id="completed-orders-count">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon budget">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Общий бюджет</h4>
+                                <p class="stat-value" id="total-budget">0 ₽</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon messages">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Новых сообщений</h4>
+                                <p class="stat-value" id="new-messages-count">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-orders">
+                        <h3>Последние заказы</h3>
+                        <div class="orders-list" id="recent-orders-list">
+                            <!-- Заказы загружаются через JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Мои заказы -->
+                <section id="orders-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Мои заказы</h2>
+                        <div class="filter-tabs">
+                            <button class="filter-btn active" data-filter="all">Все</button>
+                            <button class="filter-btn" data-filter="new">Новые</button>
+                            <button class="filter-btn" data-filter="in_progress">В работе</button>
+                            <button class="filter-btn" data-filter="review">На проверке</button>
+                            <button class="filter-btn" data-filter="completed">Завершённые</button>
+                        </div>
+                    </div>
+                    <div class="orders-container">
+                        <div class="orders-table">
+                            <div class="table-header">
+                                <div class="table-cell">Проект</div>
+                                <div class="table-cell">Тип</div>
+                                <div class="table-cell">Бюджет</div>
+                                <div class="table-cell">Срок</div>
+                                <div class="table-cell">Статус</div>
+                                <div class="table-cell">Исполнитель</div>
+                                <div class="table-cell">Действия</div>
+                            </div>
+                            <div class="table-body" id="orders-table-body">
+                                <!-- Заказы загружаются через JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Новый заказ -->
+                <section id="new-order-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Создание нового заказа</h2>
+                        <p>Заполните форму ниже для создания нового проекта</p>
+                    </div>
+
+                    <form id="create-order-form" class="order-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="project-name">Название проекта *</label>
+                                <input type="text" id="project-name" required placeholder="Например: Корпоративный сайт для компании">
+                            </div>
+                            <div class="form-group">
+                                <label for="project-type">Тип сайта *</label>
+                                <select id="project-type" required>
+                                    <option value="">Выберите тип</option>
+                                    <option value="static">Статический сайт</option>
+                                    <option value="dynamic">Динамический сайт</option>
+                                    <option value="ecommerce">Интернет-магазин</option>
+                                    <option value="landing">Landing Page</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="project-budget">Бюджет (руб.) *</label>
+                                <div class="budget-input">
+                                    <input type="number" id="project-budget" required min="10000" step="1000" placeholder="50000">
+                                    <div class="budget-presets">
+                                        <button type="button" class="budget-preset" data-amount="25000">25к</button>
+                                        <button type="button" class="budget-preset" data-amount="50000">50к</button>
+                                        <button type="button" class="budget-preset" data-amount="100000">100к</button>
+                                        <button type="button" class="budget-preset" data-amount="200000">200к</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="project-deadline">Срок выполнения (дней) *</label>
+                                <input type="number" id="project-deadline" required min="3" max="365" placeholder="30">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-prompt">Промт для разработки *</label>
+                            <div class="prompt-container">
+                                <textarea id="project-prompt" required minlength="300" maxlength="2500" 
+                                          placeholder="Опишите детально ваш проект... (от 300 до 2500 символов)"></textarea>
+                                <div class="prompt-counter">
+                                    <span id="char-count">0</span> / 2500 символов
+                                </div>
+                                <div class="prompt-tips">
+                                    <p><strong>Советы для хорошего промта:</strong></p>
+                                    <ul>
+                                        <li>Опишите цель сайта и целевую аудиторию</li>
+                                        <li>Укажите желаемый дизайн и цветовую гамму</li>
+                                        <li>Перечислите необходимые страницы и функции</li>
+                                        <li>Укажите примеры сайтов, которые вам нравятся</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-attachments">Прикреплённые файлы</label>
+                            <div class="file-upload">
+                                <input type="file" id="project-attachments" multiple style="display: none;">
+                                <div class="upload-area" id="upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Перетащите файлы сюда или <span>выберите</span></p>
+                                    <p class="upload-hint">Поддерживаются: PDF, JPG, PNG, DOC (макс. 10МБ)</p>
+                                </div>
+                                <div class="file-list" id="file-list"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="preferred-executor">Предпочтительный исполнитель</label>
+                            <select id="preferred-executor">
+                                <option value="">Любой доступный</option>
+                                <option value="1">Александр (Старший разработчик)</option>
+                                <option value="2">Максим (Frontend специалист)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" id="cancel-order">Отмена</button>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-paper-plane"></i> Создать заказ
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Сообщения -->
+                <section id="messages-section" class="content-section">
+                    <div class="messages-container">
+                        <div class="conversations-sidebar">
+                            <h3>Диалоги</h3>
+                            <div class="conversations-list" id="conversations-list">
+                                <!-- Диалоги загружаются через JS -->
+                            </div>
+                        </div>
+                        <div class="chat-main">
+                            <div class="chat-header" id="chat-header">
+                                <div class="chat-partner">
+                                    <div class="partner-avatar">А</div>
+                                    <div class="partner-info">
+                                        <h4>Выберите диалог</h4>
+                                        <p>Для начала общения</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-messages" id="chat-messages">
+                                <div class="no-chat-selected">
+                                    <i class="fas fa-comments"></i>
+                                    <p>Выберите диалог из списка слева</p>
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <textarea id="chat-input" placeholder="Введите сообщение..." disabled></textarea>
+                                <button id="send-message" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Профиль -->
+                <section id="profile-section" class="content-section">
+                    <div class="profile-container">
+                        <div class="profile-header">
+                            <h2>Мой профиль</h2>
+                            <button class="btn-secondary" id="edit-profile-btn">
+                                <i class="fas fa-edit"></i> Редактировать
+                            </button>
+                        </div>
+
+                        <div class="profile-content">
+                            <div class="profile-sidebar">
+                                <div class="avatar-large" id="profile-avatar">К</div>
+                                <h3 id="profile-name">Иван Иванов</h3>
+                                <p class="profile-role">Клиент</p>
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <span class="stat-label">Заказов</span>
+                                        <span class="stat-value" id="profile-orders-count">0</span>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <span class="stat-label">С нами</span>
+                                        <span class="stat-value" id="profile-days">1 день</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="profile-details">
+                                <div class="details-section">
+                                    <h4>Контактная информация</h4>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Email:</span>
+                                        <span class="detail-value" id="detail-email">ivan@example.com</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Телефон:</span>
+                                        <span class="detail-value" id="detail-phone">+7 (999) 123-45-67</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Telegram:</span>
+                                        <span class="detail-value" id="detail-telegram">@username</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Дата регистрации:</span>
+                                        <span class="detail-value" id="detail-reg-date">2024-01-01</span>
+                                    </div>
+                                </div>
+
+                                <div class="details-section">
+                                    <h4>Настройки аккаунта</h4>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Уведомления:</span>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="notifications-toggle" checked>
+                                            <label for="notifications-toggle"></label>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Email уведомления:</span>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="email-toggle" checked>
+                                            <label for="email-toggle"></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="details-section">
+                                    <h4>Смена пароля</h4>
+                                    <div class="password-change-form">
+                                        <input type="password" id="current-password" placeholder="Текущий пароль">
+                                        <input type="password" id="new-password" placeholder="Новый пароль">
+                                        <input type="password" id="confirm-password" placeholder="Повторите пароль">
+                                        <button class="btn-small" id="change-password-btn">Сменить пароль</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Модальное окно заказа -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-order-title">Детали заказа</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-order-details">
+                <!-- Детали заказа загружаются через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="client.js"></script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCore Platform | Вход в систему</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-main i {
+            font-size: 32px;
+            color: #667eea;
+        }
+
+        .logo-main h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 4px;
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 30px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e5e5e7;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            padding: 16px;
+            border: 2px solid #e5e5e7;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .role-option:hover {
+            border-color: #667eea;
+        }
+
+        .role-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .role-option i {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .role-option span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e7;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .executors-info {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .executors-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .executor-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #e5e5e7;
+        }
+
+        .executor-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .executor-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .executor-details span {
+            display: block;
+            font-size: 14px;
+        }
+
+        .executor-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .executor-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .role-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="logo-section">
+                <div class="logo-main">
+                    <i class="fas fa-code-branch"></i>
+                    <h1>SiteCore</h1>
+                </div>
+                <p class="tagline">Платформа для разработки сайтов</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Вход</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+
+            <!-- Форма входа -->
+            <form id="login-form" class="auth-form active">
+                <div class="role-selector">
+                    <div class="role-option selected" data-role="client">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Клиент</span>
+                    </div>
+                    <div class="role-option" data-role="executor">
+                        <i class="fas fa-code"></i>
+                        <span>Исполнитель</span>
+                    </div>
+                </div>
+                <input type="hidden" id="login-role" value="client">
+
+                <div class="form-group">
+                    <label class="form-label" for="login-email">Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="login-email" class="form-input" placeholder="Ваш email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="login-password">Пароль</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" class="form-input" placeholder="Ваш пароль" required>
+                        <button type="button" class="password-toggle" data-target="login-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-sign-in-alt"></i> Войти в систему
+                </button>
+            </form>
+
+            <!-- Форма регистрации -->
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="register-name">Полное имя</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="register-name" class="form-input" placeholder="Иван Иванов" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-email">Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="register-email" class="form-input" placeholder="example@mail.ru" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-phone">Телефон</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="register-phone" class="form-input" placeholder="+7 (999) 123-45-67" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-telegram">Telegram username</label>
+                    <div class="input-with-icon">
+                        <i class="fab fa-telegram"></i>
+                        <input type="text" id="register-telegram" class="form-input" placeholder="@username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-password">Пароль</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="register-password" class="form-input" placeholder="Не менее 6 символов" required minlength="6">
+                        <button type="button" class="password-toggle" data-target="register-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-password-confirm">Подтвердите пароль</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="register-password-confirm" class="form-input" placeholder="Повторите пароль" required>
+                        <button type="button" class="password-toggle" data-target="register-password-confirm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </button>
+            </form>
+
+            <div class="executors-info">
+                <h4>Наши исполнители:</h4>
+                <div class="executor-item">
+                    <div class="executor-avatar">А</div>
+                    <div class="executor-details">
+                        <span class="executor-name">Александр</span>
+                        <span class="executor-role">Старший разработчик</span>
+                    </div>
+                </div>
+                <div class="executor-item">
+                    <div class="executor-avatar">М</div>
+                    <div class="executor-details">
+                        <span class="executor-name">Максим</span>
+                        <span class="executor-role">Разработчик</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-footer">
+                <p>© 2026 SiteCore Platform. Все права защищены.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        // Инициализация данных
+        initializeData();
+
+        // Переключение табов
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Обновляем активные табы
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Показываем соответствующую форму
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                document.getElementById(`${tabId}-form`).classList.add('active');
+            });
+        });
+
+        // Выбор роли при входе
+        document.querySelectorAll('.role-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const role = this.getAttribute('data-role');
+                
+                document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('login-role').value = role;
+            });
+        });
+
+        // Переключение видимости пароля
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fas fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    icon.className = 'fas fa-eye';
+                }
+            });
+        });
+
+        // Обработка формы входа
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const role = document.getElementById('login-role').value;
+            
+            const errorEl = document.getElementById('error-message');
+            errorEl.classList.remove('show');
+            
+            const user = authenticateUser(email, password, role);
+            
+            if (user) {
+                // Сохраняем текущего пользователя
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                if (role === 'client') {
+                    window.location.href = 'client-dashboard.html';
+                } else {
+                    window.location.href = 'executor-dashboard.html';
+                }
+            } else {
+                errorEl.textContent = 'Неверный email или пароль';
+                errorEl.classList.add('show');
+            }
+        });
+
+        // Обработка формы регистрации
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const phone = document.getElementById('register-phone').value.trim();
+            const telegram = document.getElementById('register-telegram').value.trim();
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            
+            const errorEl = document.getElementById('error-message');
+            errorEl.classList.remove('show');
+            
+            // Валидация
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'Пароли не совпадают';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorEl.textContent = 'Пароль должен содержать не менее 6 символов';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (!telegram.startsWith('@')) {
+                errorEl.textContent = 'Telegram username должен начинаться с @';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            const result = registerClient(name, email, phone, telegram, password);
+            
+            if (result.success) {
+                // Автоматический вход после регистрации
+                const user = authenticateUser(email, password, 'client');
+                if (user) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    window.location.href = 'client-dashboard.html';
+                }
+            } else {
+                errorEl.textContent = result.message;
+                errorEl.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
