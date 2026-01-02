@@ -3,18 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiteCore | Панель разработчика</title>
+    <title>SiteCore | Панель управления</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
             --primary: #667eea;
             --primary-dark: #5a67d8;
-            --primary-light: #8a9ef5;
             --secondary: #764ba2;
             --success: #10b981;
             --warning: #f59e0b;
@@ -30,13 +23,19 @@
             --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: var(--gray-lighter);
-            min-height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        .executor-dashboard {
+        body {
+            background: var(--gray-lighter);
+            color: var(--dark);
+        }
+
+        .dashboard {
             display: grid;
             grid-template-columns: 280px 1fr;
             min-height: 100vh;
@@ -47,8 +46,6 @@
             background: linear-gradient(180deg, var(--dark) 0%, #111827 100%);
             color: white;
             padding: 30px 0;
-            display: flex;
-            flex-direction: column;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -60,7 +57,7 @@
         .logo h2 {
             font-size: 24px;
             font-weight: 800;
-            background: linear-gradient(90deg, var(--primary-light) 0%, white 100%);
+            background: linear-gradient(90deg, var(--primary) 0%, white 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
@@ -75,12 +72,12 @@
             font-weight: 600;
         }
 
-        .user-profile {
+        .user-info {
             padding: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             gap: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-avatar {
@@ -93,24 +90,22 @@
             justify-content: center;
             font-size: 24px;
             font-weight: 700;
-            color: white;
-            flex-shrink: 0;
         }
 
-        .user-info h3 {
+        .user-details h3 {
             font-size: 18px;
             font-weight: 700;
             margin-bottom: 4px;
         }
 
-        .user-info p {
+        .user-details p {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.7);
         }
 
         .nav-menu {
-            flex: 1;
             padding: 30px 0;
+            flex: 1;
         }
 
         .nav-item {
@@ -119,10 +114,9 @@
             gap: 16px;
             padding: 18px 30px;
             color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
             cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
         }
 
         .nav-item:hover {
@@ -134,12 +128,6 @@
             background: rgba(102, 126, 234, 0.1);
             color: white;
             border-left-color: var(--primary);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
         }
 
         .badge {
@@ -167,7 +155,7 @@
             border-radius: var(--radius);
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -193,22 +181,15 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .header-left h1 {
+        .header h1 {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 4px;
-            color: var(--dark);
         }
 
-        .header-left p {
+        .header p {
             color: var(--gray);
             font-size: 14px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
         }
 
         .current-date {
@@ -224,7 +205,7 @@
 
         .content-section.active {
             display: block;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.4s;
         }
 
         /* Панель управления */
@@ -242,11 +223,6 @@
             margin-bottom: 12px;
         }
 
-        .welcome-card p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -262,7 +238,7 @@
             align-items: center;
             gap: 20px;
             box-shadow: var(--shadow);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .stat-card:hover {
@@ -284,7 +260,7 @@
         .stat-icon.orders { background: var(--primary); }
         .stat-icon.clients { background: var(--success); }
         .stat-icon.revenue { background: var(--secondary); }
-        .stat-icon.developers { background: var(--warning); }
+        .stat-icon.dev { background: var(--warning); }
 
         .stat-info h4 {
             font-size: 14px;
@@ -307,12 +283,6 @@
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 12px;
-            color: var(--dark);
-        }
-
-        .section-header p {
-            color: var(--gray);
-            font-size: 16px;
         }
 
         .orders-table {
@@ -343,7 +313,7 @@
             padding: 20px;
             align-items: center;
             border-bottom: 1px solid var(--gray-light);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .order-row:hover {
@@ -361,16 +331,16 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             border: none;
         }
 
-        .btn-small.primary {
+        .btn-primary {
             background: var(--primary);
             color: white;
         }
 
-        .btn-small.secondary {
+        .btn-secondary {
             background: var(--gray-lighter);
             color: var(--dark);
             border: 1px solid var(--gray-light);
@@ -380,7 +350,7 @@
             transform: translateY(-1px);
         }
 
-        .order-status {
+        .status-badge {
             padding: 6px 16px;
             border-radius: 20px;
             font-size: 12px;
@@ -388,9 +358,9 @@
         }
 
         .status-new { background: #dbeafe; color: #1d4ed8; }
-        .status-in-progress { background: #fef3c7; color: #d97706; }
+        .status-progress { background: #fef3c7; color: #d97706; }
         .status-review { background: #fce7f3; color: #be185d; }
-        .status-completed { background: #dcfce7; color: #16a34a; }
+        .status-done { background: #dcfce7; color: #16a34a; }
 
         /* Клиенты */
         .clients-grid {
@@ -405,7 +375,7 @@
             padding: 30px;
             box-shadow: var(--shadow);
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .client-card:hover {
@@ -427,241 +397,99 @@
             margin: 0 auto 20px;
         }
 
-        .client-card h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        .client-card p {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
-
-        .client-contact {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            color: var(--dark-light);
-        }
-
-        .contact-item i {
-            width: 32px;
-            height: 32px;
-            background: var(--gray-lighter);
-            border-radius: 8px;
-            display: flex;
+        /* Модальное окно */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
             align-items: center;
             justify-content: center;
-            color: var(--gray);
+            z-index: 1000;
+            padding: 20px;
         }
 
-        /* Профиль */
-        .profile-container {
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
             background: white;
             border-radius: var(--radius-lg);
             padding: 40px;
-            box-shadow: var(--shadow);
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .profile-header {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--gray-light);
         }
 
-        .profile-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 40px;
+        .modal-header h3 {
+            font-size: 24px;
+            font-weight: 700;
         }
 
-        .profile-sidebar {
-            text-align: center;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--gray);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            font-weight: 700;
-            margin: 0 auto 20px;
+            border-radius: 50%;
         }
 
-        .profile-sidebar h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--dark);
+        .modal-close:hover {
+            background: var(--gray-lighter);
         }
 
-        .profile-role {
-            color: var(--gray);
-            margin-bottom: 30px;
+        .order-details-grid {
+            display: grid;
+            gap: 24px;
         }
 
-        .profile-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-        }
-
-        .profile-stat {
-            text-align: center;
-        }
-
-        .profile-stat .stat-value {
-            display: block;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .profile-stat .stat-label {
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .details-section {
-            margin-bottom: 40px;
-        }
-
-        .details-section h4 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-
-        .detail-row {
+        .detail-item {
             display: flex;
             justify-content: space-between;
-            padding: 16px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--gray-light);
         }
 
         .detail-label {
             font-weight: 600;
-            color: var(--dark);
+            color: var(--gray);
         }
 
         .detail-value {
-            color: var(--gray);
+            font-weight: 600;
+            color: var(--dark);
         }
 
-        /* Разработчики */
-        .developers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .developer-card {
-            background: white;
+        .prompt-content {
+            background: var(--gray-lighter);
+            padding: 24px;
             border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            transition: all 0.3s ease;
+            line-height: 1.6;
+            margin-top: 20px;
         }
 
-        .developer-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .developer-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0 auto 20px;
-        }
-
-        .developer-card h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        .developer-card p {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
-
-        .developer-stats {
-            display: flex;
-            justify-content: space-around;
-            padding-top: 20px;
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .developer-stat {
-            text-align: center;
-        }
-
-        .developer-stat .stat-value {
-            display: block;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .developer-stat .stat-label {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 40px;
-            color: var(--gray);
-            grid-column: 1 / -1;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
-            color: var(--dark);
-        }
-
+        /* Уведомления */
         .notification {
             position: fixed;
             bottom: 30px;
@@ -671,12 +499,12 @@
             padding: 20px 30px;
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
-            z-index: 1000;
+            z-index: 1001;
             display: none;
-            animation: slideInRight 0.3s ease;
+            animation: slideIn 0.3s;
         }
 
-        .notification.show {
+        .notification.active {
             display: block;
         }
 
@@ -688,22 +516,18 @@
             background: var(--danger);
         }
 
-        .notification.info {
-            background: var(--primary);
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes slideInRight {
+        @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
         @media (max-width: 1024px) {
-            .executor-dashboard {
+            .dashboard {
                 grid-template-columns: 1fr;
             }
             
@@ -711,22 +535,13 @@
                 display: none;
             }
             
-            .header {
+            .header, .content-section {
                 padding: 20px;
             }
             
-            .content-section {
-                padding: 20px;
-            }
-            
-            .table-header,
-            .order-row {
+            .table-header, .order-row {
                 grid-template-columns: 1fr;
                 gap: 12px;
-            }
-            
-            .profile-content {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -735,71 +550,65 @@
                 grid-template-columns: 1fr;
             }
             
-            .clients-grid,
-            .developers-grid {
+            .clients-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="executor-dashboard">
+    <div class="dashboard">
         <nav class="sidebar">
             <div class="logo">
                 <h2>SiteCore</h2>
-                <div class="role-badge" id="role-badge">Разработчик</div>
+                <div class="role-badge" id="role-badge">Загрузка...</div>
             </div>
 
-            <div class="user-profile">
+            <div class="user-info">
                 <div class="user-avatar" id="user-avatar">И</div>
-                <div class="user-info">
+                <div class="user-details">
                     <h3 id="user-name">Загрузка...</h3>
-                    <p id="user-role">Разработчик</p>
+                    <p id="user-role">Загрузка...</p>
                 </div>
             </div>
 
             <div class="nav-menu">
                 <div class="nav-item active" data-section="dashboard">
-                    <i>🏠</i> Панель
+                    <span>📊</span> Панель
                 </div>
                 <div class="nav-item" data-section="orders">
-                    <i>📋</i> Все заказы
-                    <span class="badge" id="orders-count">0</span>
+                    <span>📋</span> Все заказы
+                    <span class="badge" id="orders-badge">0</span>
                 </div>
                 <div class="nav-item" data-section="clients">
-                    <i>👥</i> Клиенты
-                    <span class="badge" id="clients-count">0</span>
+                    <span>👥</span> Клиенты
+                    <span class="badge" id="clients-badge">0</span>
                 </div>
-                <div class="nav-item" data-section="developers" id="developers-nav">
-                    <i>👨‍💻</i> Разработчики
-                </div>
-                <div class="nav-item" data-section="profile">
-                    <i>👤</i> Профиль
+                <div class="nav-item" data-section="assign" id="assign-nav">
+                    <span>👨‍💻</span> Назначения
                 </div>
             </div>
 
             <div class="sidebar-footer">
                 <button class="logout-btn" id="logout-btn">
-                    <i>🚪</i> Выйти
+                    <span>🚪</span> Выйти
                 </button>
             </div>
         </nav>
 
         <main class="main-content">
             <header class="header">
-                <div class="header-left">
+                <div>
                     <h1 id="page-title">Панель управления</h1>
                     <p id="page-subtitle">SiteCore Platform</p>
                 </div>
-                <div class="header-right">
-                    <div class="current-date" id="current-date"></div>
-                </div>
+                <div class="current-date" id="current-date"></div>
             </header>
 
             <!-- Панель управления -->
             <section id="dashboard-section" class="content-section active">
                 <div class="welcome-card">
-                    <h2>Добро пожаловать, <span id="welcome-name">Разработчик</span>!</h2>
+                    <h2>Добро пожаловать, <span id="welcome-name">Загрузка...</span>!</h2>
                     <p>Панель управления системой SiteCore</p>
                 </div>
 
@@ -826,10 +635,10 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon developers">👨‍💻</div>
+                        <div class="stat-icon dev">👨‍💻</div>
                         <div class="stat-info">
-                            <h4>Разработчиков</h4>
-                            <p class="stat-value" id="total-developers">0</p>
+                            <h4>Мои заказы</h4>
+                            <p class="stat-value" id="my-orders">0</p>
                         </div>
                     </div>
                 </div>
@@ -848,8 +657,8 @@
                         <div>Статус</div>
                         <div>Действия</div>
                     </div>
-                    <div class="table-body" id="recent-orders-table">
-                        <!-- Заказы загружаются через JS -->
+                    <div class="table-body" id="recent-orders">
+                        <!-- Заказы будут загружены через JS -->
                     </div>
                 </div>
             </section>
@@ -858,7 +667,7 @@
             <section id="orders-section" class="content-section">
                 <div class="section-header">
                     <h2>Все заказы</h2>
-                    <p>Управление всеми заказами системы</p>
+                    <p>Управление всеми заказами в системе</p>
                 </div>
 
                 <div class="orders-table">
@@ -871,8 +680,8 @@
                         <div>Исполнитель</div>
                         <div>Действия</div>
                     </div>
-                    <div class="table-body" id="all-orders-table">
-                        <!-- Все заказы загружаются через JS -->
+                    <div class="table-body" id="all-orders">
+                        <!-- Все заказы будут загружены через JS -->
                     </div>
                 </div>
             </section>
@@ -884,97 +693,70 @@
                     <p>Управление клиентами системы</p>
                 </div>
 
-                <div class="clients-grid" id="clients-grid">
-                    <!-- Клиенты загружаются через JS -->
+                <div class="clients-grid" id="clients-list">
+                    <!-- Клиенты будут загружены через JS -->
                 </div>
             </section>
 
-            <!-- Разработчики -->
-            <section id="developers-section" class="content-section">
+            <!-- Назначения -->
+            <section id="assign-section" class="content-section">
                 <div class="section-header">
-                    <h2>Разработчики</h2>
-                    <p>Управление командой разработчиков</p>
+                    <h2>Назначение заказов</h2>
+                    <p>Распределение заказов между разработчиками</p>
                 </div>
 
-                <div class="developers-grid" id="developers-grid">
-                    <!-- Разработчики загружаются через JS -->
-                </div>
-            </section>
-
-            <!-- Профиль -->
-            <section id="profile-section" class="content-section">
-                <div class="profile-container">
-                    <div class="profile-header">
-                        <h2>Мой профиль</h2>
+                <div class="orders-table">
+                    <div class="table-header">
+                        <div>Проект</div>
+                        <div>Клиент</div>
+                        <div>Бюджет</div>
+                        <div>Срок</div>
+                        <div>Статус</div>
+                        <div>Действия</div>
                     </div>
-
-                    <div class="profile-content">
-                        <div class="profile-sidebar">
-                            <div class="profile-avatar" id="profile-avatar">И</div>
-                            <h3 id="profile-name">Загрузка...</h3>
-                            <p class="profile-role" id="profile-role-value">Разработчик</p>
-                            <div class="profile-stats">
-                                <div class="profile-stat">
-                                    <span class="stat-value" id="profile-orders">0</span>
-                                    <span class="stat-label">Заказов</span>
-                                </div>
-                                <div class="profile-stat">
-                                    <span class="stat-value" id="profile-revenue">0 ₽</span>
-                                    <span class="stat-label">Доход</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="profile-details">
-                            <div class="details-section">
-                                <h4>Информация</h4>
-                                <div class="detail-row">
-                                    <span class="detail-label">Роль:</span>
-                                    <span class="detail-value" id="detail-role">...</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Специализация:</span>
-                                    <span class="detail-value" id="detail-specialization">...</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Статус:</span>
-                                    <span class="detail-value" id="detail-status">...</span>
-                                </div>
-                            </div>
-
-                            <div class="details-section">
-                                <h4>Статистика</h4>
-                                <div class="detail-row">
-                                    <span class="detail-label">Всего заказов:</span>
-                                    <span class="detail-value" id="detail-total-orders">0</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Активные:</span>
-                                    <span class="detail-value" id="detail-active-orders">0</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Завершённые:</span>
-                                    <span class="detail-value" id="detail-completed-orders">0</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Общий доход:</span>
-                                    <span class="detail-value" id="detail-total-revenue">0 ₽</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="table-body" id="assign-orders">
+                        <!-- Заказы для назначения будут загружены через JS -->
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
+    <!-- Модальное окно деталей заказа -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Детали заказа</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div id="modal-body">
+                <!-- Контент будет загружен через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно назначения -->
+    <div class="modal" id="assign-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Назначить заказ</h3>
+                <button class="modal-close" id="assign-close">&times;</button>
+            </div>
+            <div id="assign-body">
+                <!-- Контент будет загружен через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
     <div class="notification" id="notification"></div>
 
     <script>
-        // Приложение разработчика
-        const DeveloperApp = {
+        // Основной объект приложения
+        const ExecutorApp = {
             currentUser: null,
             isAdmin: false,
+            currentOrderId: null,
             
             // Инициализация
             init() {
@@ -984,7 +766,7 @@
                     return;
                 }
                 
-                this.checkAdmin();
+                this.checkRole();
                 this.setupEventListeners();
                 this.updateUI();
                 this.loadDashboardData();
@@ -999,19 +781,15 @@
                 }
             },
             
-            // Проверка админа
-            checkAdmin() {
+            // Проверка роли
+            checkRole() {
                 this.isAdmin = this.currentUser.role === 'admin';
             },
             
             // Получение данных
             getData() {
-                return JSON.parse(localStorage.getItem('sitecore_data')) || { 
-                    clients: [], 
-                    orders: [], 
-                    messages: {}, 
-                    developers: [] 
-                };
+                const data = localStorage.getItem('sitecore_data');
+                return data ? JSON.parse(data) : { clients: [], orders: [], developers: [] };
             },
             
             // Сохранение данных
@@ -1019,29 +797,20 @@
                 localStorage.setItem('sitecore_data', JSON.stringify(data));
             },
             
-            // Обновление интерфейса
+            // Обновление UI
             updateUI() {
                 if (!this.currentUser) return;
                 
                 // Обновляем информацию о пользователе
                 document.getElementById('user-name').textContent = this.currentUser.name;
                 document.getElementById('user-avatar').textContent = this.currentUser.avatar;
-                document.getElementById('user-role').textContent = this.currentUser.specialization;
-                
-                document.getElementById('welcome-name').textContent = this.currentUser.name;
+                document.getElementById('user-role').textContent = this.currentUser.specialization || 'Разработчик';
                 document.getElementById('role-badge').textContent = this.isAdmin ? 'Администратор' : 'Разработчик';
+                document.getElementById('welcome-name').textContent = this.currentUser.name;
                 
-                document.getElementById('profile-name').textContent = this.currentUser.name;
-                document.getElementById('profile-avatar').textContent = this.currentUser.avatar;
-                document.getElementById('profile-role-value').textContent = this.currentUser.specialization;
-                
-                document.getElementById('detail-role').textContent = this.isAdmin ? 'Администратор' : 'Разработчик';
-                document.getElementById('detail-specialization').textContent = this.currentUser.specialization;
-                document.getElementById('detail-status').textContent = this.currentUser.status || 'Online';
-                
-                // Скрываем раздел разработчиков для не-админов
+                // Скрываем раздел назначений для не-админов
                 if (!this.isAdmin) {
-                    document.getElementById('developers-nav').style.display = 'none';
+                    document.getElementById('assign-nav').style.display = 'none';
                 }
                 
                 // Обновляем дату
@@ -1061,25 +830,25 @@
                     now.toLocaleDateString('ru-RU', options);
             },
             
-            // Загрузка данных дашборда
+            // Загрузка данных панели
             loadDashboardData() {
                 const data = this.getData();
                 
-                // Общая статистика
+                // Статистика
                 const totalOrders = data.orders.length;
                 const totalClients = data.clients.length;
-                const totalDevelopers = data.developers.length;
+                const myOrders = data.orders.filter(o => o.assignedTo === this.currentUser.id).length;
                 const totalRevenue = data.orders
                     .filter(o => o.status === 'completed')
                     .reduce((sum, o) => sum + (o.budget || 0), 0);
                 
                 document.getElementById('total-orders').textContent = totalOrders;
                 document.getElementById('total-clients').textContent = totalClients;
-                document.getElementById('total-developers').textContent = totalDevelopers;
+                document.getElementById('my-orders').textContent = myOrders;
                 document.getElementById('total-revenue').textContent = this.formatCurrency(totalRevenue);
                 
-                document.getElementById('orders-count').textContent = totalOrders;
-                document.getElementById('clients-count').textContent = totalClients;
+                document.getElementById('orders-badge').textContent = totalOrders;
+                document.getElementById('clients-badge').textContent = totalClients;
                 
                 // Загружаем последние заказы
                 this.loadRecentOrders();
@@ -1090,13 +859,10 @@
                 // Загружаем клиентов
                 this.loadClients();
                 
-                // Загружаем разработчиков (только для админа)
+                // Загружаем заказы для назначения (только админ)
                 if (this.isAdmin) {
-                    this.loadDevelopers();
+                    this.loadAssignOrders();
                 }
-                
-                // Обновляем статистику профиля
-                this.updateProfileStats();
             },
             
             // Загрузка последних заказов
@@ -1106,127 +872,99 @@
                     .sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate))
                     .slice(0, 5);
                 
-                const tableBody = document.getElementById('recent-orders-table');
+                const container = document.getElementById('recent-orders');
                 
                 if (recentOrders.length === 0) {
-                    tableBody.innerHTML = `
-                        <div class="order-row" style="text-align: center; padding: 40px;">
-                            <div style="grid-column: 1 / -1;">
-                                <i style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">📝</i>
-                                <p>Нет заказов</p>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                tableBody.innerHTML = recentOrders.map(order => {
-                    const developer = order.assignedTo ? 
-                        data.developers.find(d => d.id === order.assignedTo) : null;
-                    
-                    return `
-                        <div class="order-row">
-                            <div style="font-weight: 600;">${order.projectName}</div>
-                            <div>${order.clientName}</div>
-                            <div>${this.formatCurrency(order.budget)}</div>
-                            <div>${order.deadline} дней</div>
-                            <div>
-                                <span class="order-status status-${order.status}">
-                                    ${this.getStatusText(order.status)}
-                                </span>
-                            </div>
-                            <div class="order-actions">
-                                <button class="btn-small primary" data-id="${order.id}">Подробнее</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                // Добавляем обработчики
-                document.querySelectorAll('.btn-small.primary').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const orderId = parseInt(btn.getAttribute('data-id'));
-                        this.viewOrderDetails(orderId);
-                    });
-                });
-            },
-            
-            // Загрузка всех заказов
-            loadAllOrders() {
-                const data = this.getData();
-                const tableBody = document.getElementById('all-orders-table');
-                
-                if (data.orders.length === 0) {
-                    tableBody.innerHTML = `
+                    container.innerHTML = `
                         <div class="order-row" style="text-align: center; padding: 40px; grid-column: 1 / -1;">
-                            <i style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">📝</i>
+                            <span style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">📝</span>
                             <p>Нет заказов</p>
                         </div>
                     `;
                     return;
                 }
                 
-                tableBody.innerHTML = data.orders.map(order => {
+                container.innerHTML = recentOrders.map(order => `
+                    <div class="order-row" data-id="${order.id}">
+                        <div style="font-weight: 600;">${order.projectName}</div>
+                        <div>${order.clientName}</div>
+                        <div>${this.formatCurrency(order.budget)}</div>
+                        <div>${order.deadline} дней</div>
+                        <div>
+                            <span class="status-badge status-${order.status}">
+                                ${this.getStatusText(order.status)}
+                            </span>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn-small btn-primary view-order" data-id="${order.id}">Просмотр</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                this.setupOrderEvents();
+            },
+            
+            // Загрузка всех заказов
+            loadAllOrders() {
+                const data = this.getData();
+                const container = document.getElementById('all-orders');
+                
+                if (data.orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="order-row" style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+                            <span style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">📝</span>
+                            <p>Нет заказов</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = data.orders.map(order => {
                     const developer = order.assignedTo ? 
                         data.developers.find(d => d.id === order.assignedTo) : null;
                     
                     return `
-                        <div class="order-row">
+                        <div class="order-row" data-id="${order.id}">
                             <div style="font-weight: 600;">${order.projectName}</div>
                             <div>${order.clientName}</div>
                             <div>${this.formatCurrency(order.budget)}</div>
                             <div>${order.deadline} дней</div>
                             <div>
-                                <span class="order-status status-${order.status}">
+                                <span class="status-badge status-${order.status}">
                                     ${this.getStatusText(order.status)}
                                 </span>
                             </div>
                             <div>${developer ? developer.name : 'Не назначен'}</div>
                             <div class="order-actions">
-                                <button class="btn-small primary" data-id="${order.id}">Подробнее</button>
-                                ${this.isAdmin ? `
-                                <button class="btn-small secondary" data-id="${order.id}">Назначить</button>
+                                <button class="btn-small btn-primary view-order" data-id="${order.id}">Просмотр</button>
+                                ${this.isAdmin && order.status === 'new' ? `
+                                <button class="btn-small btn-secondary assign-order" data-id="${order.id}">Назначить</button>
                                 ` : ''}
                             </div>
                         </div>
                     `;
                 }).join('');
                 
-                // Добавляем обработчики
-                document.querySelectorAll('.btn-small.primary').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const orderId = parseInt(btn.getAttribute('data-id'));
-                        this.viewOrderDetails(orderId);
-                    });
-                });
-                
-                if (this.isAdmin) {
-                    document.querySelectorAll('.btn-small.secondary').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const orderId = parseInt(btn.getAttribute('data-id'));
-                            this.assignOrder(orderId);
-                        });
-                    });
-                }
+                this.setupOrderEvents();
             },
             
             // Загрузка клиентов
             loadClients() {
                 const data = this.getData();
-                const grid = document.getElementById('clients-grid');
+                const container = document.getElementById('clients-list');
                 
                 if (data.clients.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state">
-                            <i>👥</i>
-                            <h3>Нет клиентов</h3>
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                            <span style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">👥</span>
+                            <h3 style="margin-bottom: 12px;">Нет клиентов</h3>
                             <p>Клиенты появятся после регистрации</p>
                         </div>
                     `;
                     return;
                 }
                 
-                grid.innerHTML = data.clients.map(client => {
+                container.innerHTML = data.clients.map(client => {
                     const clientOrders = data.orders.filter(o => o.clientId === client.id);
                     const completedOrders = clientOrders.filter(o => o.status === 'completed').length;
                     
@@ -1235,24 +973,24 @@
                             <div class="client-avatar">${client.avatar}</div>
                             <h3>${client.name}</h3>
                             <p>${client.email}</p>
-                            <div class="client-contact">
-                                <div class="contact-item">
-                                    <i>📱</i>
-                                    <span>${client.phone}</span>
+                            <div style="margin: 20px 0; font-size: 14px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="color: var(--gray);">Телефон:</span>
+                                    <span style="font-weight: 600;">${client.phone}</span>
                                 </div>
-                                <div class="contact-item">
-                                    <i>✈️</i>
-                                    <span>${client.telegram}</span>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--gray);">Telegram:</span>
+                                    <span style="font-weight: 600;">${client.telegram}</span>
                                 </div>
                             </div>
-                            <div class="developer-stats">
-                                <div class="developer-stat">
-                                    <span class="stat-value">${clientOrders.length}</span>
-                                    <span class="stat-label">Заказов</span>
+                            <div style="display: flex; justify-content: space-around; padding-top: 20px; border-top: 1px solid var(--gray-light);">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--primary);">${clientOrders.length}</div>
+                                    <div style="font-size: 12px; color: var(--gray);">Заказов</div>
                                 </div>
-                                <div class="developer-stat">
-                                    <span class="stat-value">${completedOrders}</span>
-                                    <span class="stat-label">Выполнено</span>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--success);">${completedOrders}</div>
+                                    <div style="font-size: 12px; color: var(--gray);">Выполнено</div>
                                 </div>
                             </div>
                         </div>
@@ -1260,76 +998,48 @@
                 }).join('');
             },
             
-            // Загрузка разработчиков (только для админа)
-            loadDevelopers() {
+            // Загрузка заказов для назначения
+            loadAssignOrders() {
                 const data = this.getData();
-                const grid = document.getElementById('developers-grid');
+                const assignOrders = data.orders.filter(o => o.status === 'new' && !o.assignedTo);
+                const container = document.getElementById('assign-orders');
                 
-                if (data.developers.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state">
-                            <i>👨‍💻</i>
-                            <h3>Нет разработчиков</h3>
-                            <p>Добавьте разработчиков в систему</p>
+                if (assignOrders.length === 0) {
+                    container.innerHTML = `
+                        <div class="order-row" style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+                            <span style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">✅</span>
+                            <p>Все заказы назначены</p>
                         </div>
                     `;
                     return;
                 }
                 
-                grid.innerHTML = data.developers.map(developer => {
-                    const developerOrders = data.orders.filter(o => o.assignedTo === developer.id);
-                    const completedOrders = developerOrders.filter(o => o.status === 'completed').length;
-                    const totalRevenue = developerOrders
-                        .filter(o => o.status === 'completed')
-                        .reduce((sum, o) => sum + (o.budget || 0), 0);
-                    
-                    return `
-                        <div class="developer-card">
-                            <div class="developer-avatar">${developer.avatar}</div>
-                            <h3>${developer.name}</h3>
-                            <p>${developer.specialization}</p>
-                            <div class="developer-stats">
-                                <div class="developer-stat">
-                                    <span class="stat-value">${developerOrders.length}</span>
-                                    <span class="stat-label">Заказов</span>
-                                </div>
-                                <div class="developer-stat">
-                                    <span class="stat-value">${completedOrders}</span>
-                                    <span class="stat-label">Выполнено</span>
-                                </div>
-                                <div class="developer-stat">
-                                    <span class="stat-value">${this.formatCurrency(totalRevenue)}</span>
-                                    <span class="stat-label">Доход</span>
-                                </div>
-                            </div>
+                container.innerHTML = assignOrders.map(order => `
+                    <div class="order-row" data-id="${order.id}">
+                        <div style="font-weight: 600;">${order.projectName}</div>
+                        <div>${order.clientName}</div>
+                        <div>${this.formatCurrency(order.budget)}</div>
+                        <div>${order.deadline} дней</div>
+                        <div>
+                            <span class="status-badge status-new">Новый</span>
                         </div>
-                    `;
-                }).join('');
+                        <div class="order-actions">
+                            <button class="btn-small btn-primary assign-order" data-id="${order.id}">Назначить</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.assign-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const orderId = parseInt(btn.getAttribute('data-id'));
+                        this.showAssignModal(orderId);
+                    });
+                });
             },
             
-            // Обновление статистики профиля
-            updateProfileStats() {
-                if (!this.currentUser) return;
-                
-                const data = this.getData();
-                const userOrders = data.orders.filter(o => o.assignedTo === this.currentUser.id);
-                const activeOrders = userOrders.filter(o => o.status === 'in-progress').length;
-                const completedOrders = userOrders.filter(o => o.status === 'completed').length;
-                const totalRevenue = userOrders
-                    .filter(o => o.status === 'completed')
-                    .reduce((sum, o) => sum + (o.budget || 0), 0);
-                
-                document.getElementById('profile-orders').textContent = userOrders.length;
-                document.getElementById('profile-revenue').textContent = this.formatCurrency(totalRevenue);
-                
-                document.getElementById('detail-total-orders').textContent = userOrders.length;
-                document.getElementById('detail-active-orders').textContent = activeOrders;
-                document.getElementById('detail-completed-orders').textContent = completedOrders;
-                document.getElementById('detail-total-revenue').textContent = this.formatCurrency(totalRevenue);
-            },
-            
-            // Просмотр деталей заказа
-            viewOrderDetails(orderId) {
+            // Показать детали заказа
+            showOrderDetails(orderId) {
                 const data = this.getData();
                 const order = data.orders.find(o => o.id === orderId);
                 
@@ -1338,197 +1048,189 @@
                 const developer = order.assignedTo ? 
                     data.developers.find(d => d.id === order.assignedTo) : null;
                 
-                const html = `
-                    <div style="padding: 20px; max-width: 600px;">
-                        <h3 style="margin-bottom: 24px; color: var(--dark);">${order.projectName}</h3>
-                        
-                        <div style="display: grid; gap: 16px; margin-bottom: 24px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Клиент:</span>
-                                <span style="font-weight: 600;">${order.clientName}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Email:</span>
-                                <span style="font-weight: 600;">${order.clientEmail}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Телефон:</span>
-                                <span style="font-weight: 600;">${order.clientPhone}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Telegram:</span>
-                                <span style="font-weight: 600;">${order.clientTelegram}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Тип сайта:</span>
-                                <span style="font-weight: 600;">${this.getTypeText(order.projectType)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Бюджет:</span>
-                                <span style="font-weight: 600;">${this.formatCurrency(order.budget)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Срок:</span>
-                                <span style="font-weight: 600;">${order.deadline} дней</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Статус:</span>
-                                <span class="order-status status-${order.status}">
-                                    ${this.getStatusText(order.status)}
-                                </span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Исполнитель:</span>
-                                <span style="font-weight: 600;">${developer ? developer.name : 'Не назначен'}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--gray);">Создан:</span>
-                                <span style="font-weight: 600;">${new Date(order.createdDate).toLocaleDateString()}</span>
-                            </div>
+                document.getElementById('modal-title').textContent = order.projectName;
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="order-details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Клиент:</span>
+                            <span class="detail-value">${order.clientName}</span>
                         </div>
-                        
-                        <div style="margin-top: 24px;">
-                            <h4 style="margin-bottom: 12px; color: var(--dark);">Промт от клиента:</h4>
-                            <div style="background: var(--gray-lighter); padding: 20px; border-radius: var(--radius); line-height: 1.6;">
-                                ${order.prompt}
-                            </div>
-                            <div style="margin-top: 12px; font-size: 14px; color: var(--gray); text-align: right;">
-                                ${order.prompt.length} символов
-                            </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${order.clientEmail}</span>
                         </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Телефон:</span>
+                            <span class="detail-value">${order.clientPhone}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Telegram:</span>
+                            <span class="detail-value">${order.clientTelegram}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Тип сайта:</span>
+                            <span class="detail-value">${this.getTypeText(order.projectType)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Бюджет:</span>
+                            <span class="detail-value">${this.formatCurrency(order.budget)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Срок:</span>
+                            <span class="detail-value">${order.deadline} дней</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Статус:</span>
+                            <span class="detail-value status-badge status-${order.status}">
+                                ${this.getStatusText(order.status)}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Исполнитель:</span>
+                            <span class="detail-value">${developer ? developer.name : 'Не назначен'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Создан:</span>
+                            <span class="detail-value">${new Date(order.createdDate).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 30px 0 10px; color: var(--dark);">Описание проекта:</h4>
+                    <div class="prompt-content">
+                        ${order.prompt}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 14px; color: var(--gray); text-align: right;">
+                        ${order.prompt.length} символов
                     </div>
                 `;
                 
-                this.showModal('Детали заказа', html);
+                document.getElementById('order-modal').classList.add('active');
             },
             
-            // Назначение заказа (только для админа)
-            assignOrder(orderId) {
+            // Показать модальное окно назначения
+            showAssignModal(orderId) {
                 const data = this.getData();
                 const order = data.orders.find(o => o.id === orderId);
-                
-                if (!order) {
-                    this.showNotification('Заказ не найден', 'error');
-                    return;
-                }
-                
                 const developers = data.developers.filter(d => d.role === 'developer');
                 
-                if (developers.length === 0) {
+                if (!order || developers.length === 0) {
                     this.showNotification('Нет доступных разработчиков', 'error');
                     return;
                 }
                 
-                const html = `
-                    <div style="padding: 20px; max-width: 400px;">
-                        <h3 style="margin-bottom: 16px; color: var(--dark);">Назначить заказ</h3>
-                        <p style="color: var(--gray); margin-bottom: 24px;">Выберите разработчика для заказа "${order.projectName}"</p>
-                        
-                        <div style="margin-bottom: 24px;">
-                            <select id="assign-developer" style="width: 100%; padding: 12px; border: 2px solid var(--gray-light); border-radius: var(--radius);">
-                                <option value="">Выберите разработчика</option>
-                                ${developers.map(dev => `
-                                    <option value="${dev.id}" ${order.assignedTo === dev.id ? 'selected' : ''}>
-                                        ${dev.name} - ${dev.specialization}
-                                    </option>
-                                `).join('')}
-                            </select>
-                        </div>
-                        
-                        <div style="display: flex; gap: 12px;">
-                            <button id="cancel-assign" style="flex: 1; padding: 12px; background: var(--gray-lighter); border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer;">
-                                Отмена
-                            </button>
-                            <button id="save-assign" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer;">
-                                Назначить
-                            </button>
-                        </div>
+                this.currentOrderId = orderId;
+                
+                document.getElementById('assign-body').innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 8px; color: var(--dark);">Проект: ${order.projectName}</h4>
+                        <p style="color: var(--gray);">Клиент: ${order.clientName}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark);">
+                            Выберите разработчика:
+                        </label>
+                        <select id="developer-select" style="width: 100%; padding: 12px; border: 2px solid var(--gray-light); border-radius: var(--radius); font-size: 16px;">
+                            <option value="">Выберите разработчика</option>
+                            ${developers.map(dev => `
+                                <option value="${dev.id}">${dev.name} - ${dev.specialization}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button id="cancel-assign" style="flex: 1; padding: 14px; background: var(--gray-lighter); border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer;">
+                            Отмена
+                        </button>
+                        <button id="save-assign" style="flex: 1; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer;">
+                            Назначить
+                        </button>
                     </div>
                 `;
                 
-                this.showModal('Назначение заказа', html, () => {
-                    const modal = document.querySelector('.modal-overlay.active');
-                    const select = modal.querySelector('#assign-developer');
-                    const saveBtn = modal.querySelector('#save-assign');
-                    const cancelBtn = modal.querySelector('#cancel-assign');
+                document.getElementById('assign-modal').classList.add('active');
+                
+                // Обработчики для модального окна назначения
+                document.getElementById('cancel-assign').addEventListener('click', () => {
+                    document.getElementById('assign-modal').classList.remove('active');
+                });
+                
+                document.getElementById('save-assign').addEventListener('click', () => {
+                    const developerId = parseInt(document.getElementById('developer-select').value);
                     
-                    saveBtn.addEventListener('click', () => {
-                        const developerId = parseInt(select.value);
-                        
-                        if (!developerId) {
-                            this.showNotification('Выберите разработчика', 'error');
-                            return;
-                        }
-                        
-                        const orderIndex = data.orders.findIndex(o => o.id === orderId);
-                        if (orderIndex !== -1) {
-                            data.orders[orderIndex] = {
-                                ...data.orders[orderIndex],
-                                assignedTo: developerId,
-                                status: 'in-progress',
-                                updatedDate: new Date().toISOString()
-                            };
-                            
-                            this.saveData(data);
-                            this.showNotification('Заказ назначен', 'success');
-                            this.loadDashboardData();
-                            document.body.removeChild(modal);
-                        }
-                    });
+                    if (!developerId) {
+                        this.showNotification('Выберите разработчика', 'error');
+                        return;
+                    }
                     
-                    cancelBtn.addEventListener('click', () => {
-                        document.body.removeChild(modal);
-                    });
+                    this.assignOrderToDeveloper(developerId);
                 });
             },
             
-            // Показать модальное окно
-            showModal(title, content, onOpen = null) {
-                const modal = document.createElement('div');
-                modal.className = 'modal-overlay active';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.5);
-                    backdrop-filter: blur(4px);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                    padding: 20px;
-                `;
+            // Назначить заказ разработчику
+            assignOrderToDeveloper(developerId) {
+                const data = this.getData();
+                const orderIndex = data.orders.findIndex(o => o.id === this.currentOrderId);
                 
-                modal.innerHTML = `
-                    <div style="background: white; border-radius: var(--radius-lg); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
-                        <div style="padding: 24px; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: center;">
-                            <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--dark);">${title}</h3>
-                            <button class="modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray);">&times;</button>
-                        </div>
-                        <div>${content}</div>
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-                
-                // Обработчик закрытия
-                modal.querySelector('.modal-close').addEventListener('click', () => {
-                    document.body.removeChild(modal);
-                });
-                
-                // Закрытие по клику на фон
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        document.body.removeChild(modal);
-                    }
-                });
-                
-                // Вызов колбэка после открытия
-                if (onOpen) {
-                    onOpen();
+                if (orderIndex === -1) {
+                    this.showNotification('Заказ не найден', 'error');
+                    return;
                 }
+                
+                const developer = data.developers.find(d => d.id === developerId);
+                if (!developer) {
+                    this.showNotification('Разработчик не найден', 'error');
+                    return;
+                }
+                
+                // Обновляем заказ
+                data.orders[orderIndex] = {
+                    ...data.orders[orderIndex],
+                    assignedTo: developerId,
+                    status: 'in-progress',
+                    updatedDate: new Date().toISOString()
+                };
+                
+                this.saveData(data);
+                
+                // Закрываем модальные окна
+                document.getElementById('assign-modal').classList.remove('active');
+                document.getElementById('order-modal').classList.remove('active');
+                
+                // Показываем уведомление
+                this.showNotification(`Заказ назначен разработчику ${developer.name}`, 'success');
+                
+                // Обновляем данные
+                this.loadDashboardData();
+                this.loadAssignOrders();
+            },
+            
+            // Настройка событий заказов
+            setupOrderEvents() {
+                document.querySelectorAll('.view-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const orderId = parseInt(btn.getAttribute('data-id'));
+                        this.showOrderDetails(orderId);
+                    });
+                });
+                
+                document.querySelectorAll('.assign-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const orderId = parseInt(btn.getAttribute('data-id'));
+                        this.showAssignModal(orderId);
+                    });
+                });
+                
+                document.querySelectorAll('.order-row').forEach(row => {
+                    row.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('btn-small')) {
+                            const orderId = parseInt(row.getAttribute('data-id'));
+                            this.showOrderDetails(orderId);
+                        }
+                    });
+                });
             },
             
             // Настройка навигации
@@ -1547,7 +1249,6 @@
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
                 });
-                
                 document.querySelector(`[data-section="${section}"]`).classList.add('active');
                 
                 // Скрываем все разделы
@@ -1566,8 +1267,8 @@
                     this.loadAllOrders();
                 } else if (section === 'clients') {
                     this.loadClients();
-                } else if (section === 'developers' && this.isAdmin) {
-                    this.loadDevelopers();
+                } else if (section === 'assign' && this.isAdmin) {
+                    this.loadAssignOrders();
                 } else if (section === 'dashboard') {
                     this.loadDashboardData();
                 }
@@ -1579,16 +1280,14 @@
                     'dashboard': 'Панель управления',
                     'orders': 'Все заказы',
                     'clients': 'Клиенты',
-                    'developers': 'Разработчики',
-                    'profile': 'Профиль'
+                    'assign': 'Назначения'
                 };
                 
                 const subtitles = {
                     'dashboard': 'Обзор системы SiteCore',
                     'orders': 'Управление всеми заказами',
                     'clients': 'Все клиенты системы',
-                    'developers': 'Управление командой разработчиков',
-                    'profile': 'Ваш профиль'
+                    'assign': 'Распределение заказов между разработчиками'
                 };
                 
                 document.getElementById('page-title').textContent = titles[section] || 'Панель';
@@ -1601,6 +1300,28 @@
                 document.getElementById('logout-btn').addEventListener('click', () => {
                     localStorage.removeItem('currentUser');
                     window.location.href = 'index.html';
+                });
+                
+                // Закрытие модальных окон
+                document.getElementById('modal-close').addEventListener('click', () => {
+                    document.getElementById('order-modal').classList.remove('active');
+                });
+                
+                document.getElementById('assign-close').addEventListener('click', () => {
+                    document.getElementById('assign-modal').classList.remove('active');
+                });
+                
+                // Закрытие модальных окон по клику на фон
+                document.getElementById('order-modal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('order-modal')) {
+                        document.getElementById('order-modal').classList.remove('active');
+                    }
+                });
+                
+                document.getElementById('assign-modal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('assign-modal')) {
+                        document.getElementById('assign-modal').classList.remove('active');
+                    }
                 });
             },
             
@@ -1636,17 +1357,17 @@
             showNotification(message, type = 'info') {
                 const notification = document.getElementById('notification');
                 notification.textContent = message;
-                notification.className = `notification ${type} show`;
+                notification.className = `notification ${type} active`;
                 
                 setTimeout(() => {
-                    notification.classList.remove('show');
+                    notification.classList.remove('active');
                 }, 3000);
             }
         };
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', () => {
-            DeveloperApp.init();
+            ExecutorApp.init();
         });
     </script>
 </body>
