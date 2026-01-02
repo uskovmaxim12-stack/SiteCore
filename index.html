@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiteCore | Вход в систему</title>
+    <title>SiteCore | Платформа заказов сайтов</title>
     <style>
         * {
             margin: 0;
@@ -12,44 +12,47 @@
         }
 
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #3f37c9;
-            --accent: #4cc9f0;
-            --success: #06d6a0;
-            --warning: #ffd166;
-            --danger: #ef476f;
-            --dark: #1a1a2e;
-            --darker: #16213e;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --primary-light: #8a9ef5;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --gray-lighter: #f3f4f6;
+            --white: #ffffff;
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            color: var(--light);
         }
 
         .auth-container {
             width: 100%;
-            max-width: 440px;
+            max-width: 480px;
+            animation: fadeIn 0.6s ease;
         }
 
         .auth-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 50px 40px;
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
@@ -61,79 +64,69 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-        }
-
-        .logo-section {
-            text-align: center;
-            margin-bottom: 40px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
         }
 
         .logo {
-            display: inline-flex;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 40px;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 12px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
+            font-size: 32px;
         }
 
-        .logo-text {
+        .logo-text h1 {
             font-size: 36px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
         .tagline {
-            color: var(--dark);
+            color: var(--gray);
             font-size: 16px;
-            font-weight: 500;
-            opacity: 0.8;
             line-height: 1.5;
         }
 
         .auth-tabs {
             display: flex;
-            background: var(--gray-light);
-            border-radius: 12px;
-            padding: 4px;
+            background: var(--gray-lighter);
+            border-radius: var(--radius);
+            padding: 6px;
             margin-bottom: 32px;
         }
 
         .auth-tab {
             flex: 1;
-            padding: 14px;
-            border: none;
+            padding: 16px;
             background: transparent;
-            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--gray);
             cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .auth-tab:hover {
-            color: var(--primary);
+            transition: all 0.3s ease;
         }
 
         .auth-tab.active {
-            background: white;
+            background: var(--white);
             color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow);
         }
 
         .auth-form {
@@ -147,18 +140,35 @@
 
         .form-group {
             margin-bottom: 24px;
+            text-align: left;
         }
 
-        .form-label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 14px;
             font-weight: 600;
             color: var(--dark);
+            font-size: 14px;
         }
 
         .input-with-icon {
             position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .input-icon {
@@ -168,25 +178,6 @@
             transform: translateY(-50%);
             color: var(--gray);
             font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 16px 16px 16px 48px;
-            border: 2px solid var(--gray-light);
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background: white;
-            color: var(--dark);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
         }
 
         .password-toggle {
@@ -199,65 +190,78 @@
             color: var(--gray);
             cursor: pointer;
             font-size: 18px;
-            padding: 4px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .btn-auth {
+        .btn-primary {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 18px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius);
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .dev-login-btn {
+            width: 100%;
+            padding: 18px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
 
-        .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+        .dev-login-btn:hover {
+            background: var(--primary);
+            color: white;
         }
 
-        .btn-auth:active {
-            transform: translateY(0);
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 32px 0;
+            color: var(--gray);
         }
 
-        .form-footer {
-            margin-top: 24px;
-            text-align: center;
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-light);
         }
 
-        .form-footer a {
-            color: var(--primary);
-            text-decoration: none;
+        .auth-divider span {
+            padding: 0 16px;
             font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
         }
 
         .error-message {
-            background: rgba(239, 71, 111, 0.1);
+            background: rgba(239, 68, 68, 0.1);
             color: var(--danger);
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
             font-size: 14px;
             display: none;
-            border-left: 4px solid var(--danger);
         }
 
         .error-message.show {
@@ -265,76 +269,118 @@
             animation: slideDown 0.3s ease;
         }
 
-        .register-link {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--gray-light);
-            color: var(--gray);
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
             font-size: 14px;
+            display: none;
         }
 
-        .register-link a {
-            color: var(--primary);
-            text-decoration: none;
+        .success-message.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 8px;
+            text-align: left;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .modal p {
+            color: var(--gray);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 14px;
+            background: var(--gray-lighter);
+            color: var(--dark);
+            border: none;
+            border-radius: var(--radius);
             font-weight: 600;
-            margin-left: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .register-link a:hover {
-            text-decoration: underline;
+        .btn-secondary:hover {
+            background: var(--gray-light);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Анимация загрузки */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Адаптивность */
         @media (max-width: 480px) {
             .auth-card {
-                padding: 32px 24px;
+                padding: 40px 20px;
             }
             
-            .logo-text {
+            .logo-text h1 {
                 font-size: 28px;
             }
             
-            .auth-tab {
-                padding: 12px;
-                font-size: 14px;
+            .modal-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -342,119 +388,174 @@
 <body>
     <div class="auth-container">
         <div class="auth-card">
-            <div class="logo-section">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                        </svg>
-                    </div>
-                    <div class="logo-text">SiteCore</div>
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
                 </div>
-                <p class="tagline">Профессиональная платформа для разработки сайтов</p>
+                <div class="logo-text">
+                    <h1>SiteCore</h1>
+                    <p class="tagline">Профессиональная платформа для заказа сайтов</p>
+                </div>
             </div>
-
+            
             <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="client">Клиент</button>
-                <button class="auth-tab" data-tab="executor">Разработчик</button>
+                <button class="auth-tab active" data-tab="login">Вход</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
             </div>
-
+            
             <div class="error-message" id="error-message"></div>
-
-            <!-- Форма входа клиента -->
-            <form id="client-form" class="auth-form active">
+            <div class="success-message" id="success-message"></div>
+            
+            <!-- Форма входа -->
+            <form id="login-form" class="auth-form active">
                 <div class="form-group">
-                    <label class="form-label" for="client-email">Email</label>
+                    <label for="login-email">Email</label>
                     <div class="input-with-icon">
-                        <div class="input-icon">@</div>
-                        <input type="email" id="client-email" class="form-input" placeholder="your@email.com" required>
+                        <span class="input-icon">📧</span>
+                        <input type="email" id="login-email" class="form-input" placeholder="example@mail.ru" required>
                     </div>
                 </div>
-
+                
                 <div class="form-group">
-                    <label class="form-label" for="client-password">Пароль</label>
+                    <label for="login-password">Пароль</label>
                     <div class="input-with-icon">
-                        <div class="input-icon">🔒</div>
-                        <input type="password" id="client-password" class="form-input" placeholder="Ваш пароль" required>
-                        <button type="button" class="password-toggle" data-target="client-password">
-                            👁️
-                        </button>
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="login-password" class="form-input" placeholder="Ваш пароль" required>
+                        <button type="button" class="password-toggle" data-target="login-password">👁️</button>
                     </div>
                 </div>
-
-                <button type="submit" class="btn-auth" id="client-login-btn">
-                    <span>Войти в систему</span>
-                </button>
-
-                <div class="form-footer">
-                    <a href="#" id="forgot-password">Забыли пароль?</a>
+                
+                <button type="submit" class="btn-primary">Войти в аккаунт</button>
+                
+                <div class="auth-divider">
+                    <span>Или</span>
                 </div>
-            </form>
-
-            <!-- Форма входа разработчика -->
-            <form id="executor-form" class="auth-form">
-                <div class="form-group">
-                    <label class="form-label" for="executor-password">Пароль разработчика</label>
-                    <div class="input-with-icon">
-                        <div class="input-icon">🔑</div>
-                        <input type="password" id="executor-password" class="form-input" placeholder="Введите пароль разработчика" required>
-                        <button type="button" class="password-toggle" data-target="executor-password">
-                            👁️
-                        </button>
-                    </div>
-                    <p style="margin-top: 8px; font-size: 12px; color: var(--gray);">
-                        Пароль определяет тип аккаунта
-                    </p>
-                </div>
-
-                <button type="submit" class="btn-auth" id="executor-login-btn">
-                    <span>Войти как разработчик</span>
+                
+                <button type="button" class="dev-login-btn" id="dev-login-btn">
+                    <span>👨‍💻 Войти как разработчик</span>
                 </button>
             </form>
-
-            <div class="register-link">
-                Нет аккаунта? <a href="register.html">Зарегистрироваться как клиент</a>
+            
+            <!-- Форма регистрации -->
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name">Ваше имя</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="register-name" class="form-input" placeholder="Иван Иванов" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📧</span>
+                        <input type="email" id="register-email" class="form-input" placeholder="example@mail.ru" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-phone">Телефон</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📱</span>
+                        <input type="tel" id="register-phone" class="form-input" placeholder="+7 (999) 123-45-67" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-telegram">Telegram</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">✈️</span>
+                        <input type="text" id="register-telegram" class="form-input" placeholder="@username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="register-password" class="form-input" placeholder="Придумайте пароль" required minlength="6">
+                        <button type="button" class="password-toggle" data-target="register-password">👁️</button>
+                    </div>
+                    <p class="password-hint">Минимум 6 символов</p>
+                </div>
+                
+                <button type="submit" class="btn-primary">Создать аккаунт</button>
+                
+                <div class="auth-divider">
+                    <span>Или</span>
+                </div>
+                
+                <button type="button" class="dev-login-btn" id="dev-login-btn-register">
+                    <span>👨‍💻 Войти как разработчик</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Модальное окно входа разработчика -->
+    <div class="modal-overlay" id="dev-modal">
+        <div class="modal">
+            <h3>Вход для разработчика</h3>
+            <p>Введите пароль разработчика или администратора</p>
+            
+            <div class="error-message" id="dev-error-message"></div>
+            
+            <div class="form-group">
+                <div class="input-with-icon">
+                    <span class="input-icon">🔑</span>
+                    <input type="password" id="dev-password" class="form-input" placeholder="Пароль разработчика" required>
+                    <button type="button" class="password-toggle" data-target="dev-password">👁️</button>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancel-dev">Отмена</button>
+                <button class="btn-primary" id="submit-dev">Войти</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Инициализация данных
+        // Инициализация данных при первом запуске
         function initData() {
             if (!localStorage.getItem('sitecore_data')) {
                 const initialData = {
                     clients: [],
                     orders: [],
                     messages: {},
-                    executors: {
-                        '140612': { // Пароль для администратора
+                    // Предустановленные аккаунты разработчиков (в реальном проекте должны быть на сервере)
+                    developers: [
+                        {
                             id: 1,
-                            name: "Максим",
-                            role: "admin",
-                            avatar: "М",
-                            permissions: ["all"],
-                            email: "max@sitecore.dev"
-                        },
-                        '789653': { // Пароль для разработчика
-                            id: 2,
                             name: "Александр",
-                            role: "executor",
+                            role: "developer",
+                            password: "789653",
+                            specialization: "Старший разработчик",
                             avatar: "А",
-                            permissions: ["view_orders", "take_orders", "update_status", "chat"],
-                            email: "alex@sitecore.dev"
+                            status: "online"
+                        },
+                        {
+                            id: 2,
+                            name: "Максим",
+                            role: "developer",
+                            password: "140612",
+                            specialization: "Frontend разработчик",
+                            avatar: "М",
+                            status: "online"
+                        },
+                        {
+                            id: 3,
+                            name: "Администратор",
+                            role: "admin",
+                            password: "admin123",
+                            specialization: "Администратор системы",
+                            avatar: "A",
+                            status: "online"
                         }
-                    },
-                    settings: {
-                        minPromptLength: 300,
-                        maxPromptLength: 2500,
-                        orderStatuses: [
-                            { id: 'new', name: 'Новая', color: '#3b82f6' },
-                            { id: 'in_progress', name: 'В работе', color: '#f59e0b' },
-                            { id: 'review', name: 'На проверке', color: '#8b5cf6' },
-                            { id: 'completed', name: 'Завершена', color: '#10b981' },
-                            { id: 'rejected', name: 'Отклонена', color: '#ef4444' }
-                        ]
-                    }
+                    ]
                 };
                 localStorage.setItem('sitecore_data', JSON.stringify(initialData));
             }
@@ -462,7 +563,7 @@
 
         // Получение данных
         function getData() {
-            return JSON.parse(localStorage.getItem('sitecore_data')) || { clients: [], orders: [], messages: {}, executors: {} };
+            return JSON.parse(localStorage.getItem('sitecore_data')) || { clients: [], orders: [], messages: {}, developers: [] };
         }
 
         // Сохранение данных
@@ -470,17 +571,12 @@
             localStorage.setItem('sitecore_data', JSON.stringify(data));
         }
 
-        // Сохранение сессии
-        function saveSession(user) {
-            localStorage.setItem('current_session', JSON.stringify(user));
-        }
-
         // Переключение табов
         document.querySelectorAll('.auth-tab').forEach(tab => {
             tab.addEventListener('click', function() {
-                const tabId = this.dataset.tab;
+                const tabId = this.getAttribute('data-tab');
                 
-                // Обновляем активные табы
+                // Обновляем активный таб
                 document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 
@@ -488,17 +584,16 @@
                 document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
                 document.getElementById(`${tabId}-form`).classList.add('active');
                 
-                // Очищаем ошибки
-                document.getElementById('error-message').classList.remove('show');
+                // Скрываем сообщения
+                hideMessages();
             });
         });
 
         // Переключение видимости пароля
         document.querySelectorAll('.password-toggle').forEach(btn => {
             btn.addEventListener('click', function() {
-                const targetId = this.dataset.target;
+                const targetId = this.getAttribute('data-target');
                 const input = document.getElementById(targetId);
-                const currentText = this.textContent;
                 
                 if (input.type === 'password') {
                     input.type = 'text';
@@ -510,81 +605,162 @@
             });
         });
 
-        // Вход клиента
-        document.getElementById('client-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('client-email').value.trim().toLowerCase();
-            const password = document.getElementById('client-password').value;
-            
-            const errorEl = document.getElementById('error-message');
-            const button = document.getElementById('client-login-btn');
-            const originalText = button.innerHTML;
-            
-            // Показываем загрузку
-            button.innerHTML = '<div class="loading"></div>';
-            button.disabled = true;
-            
-            setTimeout(() => {
-                const data = getData();
-                
-                // Ищем клиента
-                const client = data.clients.find(c => c.email === email && c.password === password);
-                
-                if (client) {
-                    // Сохраняем сессию
-                    saveSession(client);
-                    window.location.href = 'client.html';
-                } else {
-                    errorEl.textContent = 'Неверный email или пароль';
-                    errorEl.classList.add('show');
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }
-            }, 500);
-        });
+        // Скрытие сообщений
+        function hideMessages() {
+            document.getElementById('error-message').classList.remove('show');
+            document.getElementById('success-message').classList.remove('show');
+            document.getElementById('dev-error-message').classList.remove('show');
+        }
+
+        // Открытие модального окна разработчика
+        function openDevModal() {
+            document.getElementById('dev-modal').classList.add('active');
+            document.getElementById('dev-password').value = '';
+            document.getElementById('dev-error-message').classList.remove('show');
+        }
+
+        // Закрытие модального окна разработчика
+        function closeDevModal() {
+            document.getElementById('dev-modal').classList.remove('active');
+        }
+
+        // Кнопки входа разработчика
+        document.getElementById('dev-login-btn').addEventListener('click', openDevModal);
+        document.getElementById('dev-login-btn-register').addEventListener('click', openDevModal);
+        document.getElementById('cancel-dev').addEventListener('click', closeDevModal);
 
         // Вход разработчика
-        document.getElementById('executor-form').addEventListener('submit', function(e) {
+        document.getElementById('submit-dev').addEventListener('click', function() {
+            const password = document.getElementById('dev-password').value;
+            const errorEl = document.getElementById('dev-error-message');
+            
+            const data = getData();
+            const developer = data.developers.find(d => d.password === password);
+            
+            if (developer) {
+                // Сохраняем сессию
+                localStorage.setItem('currentUser', JSON.stringify(developer));
+                
+                // Перенаправляем на панель исполнителя
+                window.location.href = 'executor.html';
+            } else {
+                errorEl.textContent = 'Неверный пароль разработчика';
+                errorEl.classList.add('show');
+            }
+        });
+
+        // Вход разработчика по Enter
+        document.getElementById('dev-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('submit-dev').click();
+            }
+        });
+
+        // Регистрация клиента
+        document.getElementById('register-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const password = document.getElementById('executor-password').value;
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const phone = document.getElementById('register-phone').value.trim();
+            const telegram = document.getElementById('register-telegram').value.trim();
+            const password = document.getElementById('register-password').value;
             
             const errorEl = document.getElementById('error-message');
-            const button = document.getElementById('executor-login-btn');
-            const originalText = button.innerHTML;
+            const successEl = document.getElementById('success-message');
             
-            // Показываем загрузку
-            button.innerHTML = '<div class="loading"></div>';
-            button.disabled = true;
+            // Валидация
+            if (!telegram.startsWith('@')) {
+                errorEl.textContent = 'Telegram должен начинаться с @';
+                errorEl.classList.add('show');
+                successEl.classList.remove('show');
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorEl.textContent = 'Пароль должен содержать не менее 6 символов';
+                errorEl.classList.add('show');
+                successEl.classList.remove('show');
+                return;
+            }
+            
+            const data = getData();
+            
+            // Проверяем, есть ли уже клиент с таким email
+            const emailExists = data.clients.some(client => client.email === email);
+            if (emailExists) {
+                errorEl.textContent = 'Пользователь с таким email уже зарегистрирован';
+                errorEl.classList.add('show');
+                successEl.classList.remove('show');
+                return;
+            }
+            
+            // Создаем нового клиента
+            const newClient = {
+                id: Date.now(),
+                name,
+                email,
+                phone,
+                telegram,
+                password,
+                role: 'client',
+                avatar: name.charAt(0).toUpperCase(),
+                registrationDate: new Date().toISOString(),
+                status: 'active'
+            };
+            
+            data.clients.push(newClient);
+            saveData(data);
+            
+            // Автоматический вход
+            localStorage.setItem('currentUser', JSON.stringify(newClient));
+            
+            successEl.textContent = 'Аккаунт успешно создан! Перенаправляем...';
+            successEl.classList.add('show');
+            errorEl.classList.remove('show');
             
             setTimeout(() => {
-                const data = getData();
-                
-                // Проверяем пароль
-                const executor = data.executors[password];
-                
-                if (executor) {
-                    // Сохраняем сессию
-                    saveSession(executor);
-                    
-                    // Перенаправляем в зависимости от роли
-                    if (executor.role === 'admin') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'executor.html';
-                    }
-                } else {
-                    errorEl.textContent = 'Неверный пароль разработчика';
-                    errorEl.classList.add('show');
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }
-            }, 500);
+                window.location.href = 'client-dashboard.html';
+            }, 1500);
+        });
+
+        // Вход клиента
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('error-message');
+            
+            const data = getData();
+            const client = data.clients.find(c => c.email === email && c.password === password);
+            
+            if (client) {
+                // Сохраняем сессию
+                localStorage.setItem('currentUser', JSON.stringify(client));
+                window.location.href = 'client-dashboard.html';
+            } else {
+                errorEl.textContent = 'Неверный email или пароль';
+                errorEl.classList.add('show');
+                document.getElementById('success-message').classList.remove('show');
+            }
         });
 
         // Инициализация при загрузке
-        initData();
+        document.addEventListener('DOMContentLoaded', function() {
+            initData();
+            
+            // Автоматический переход, если уже авторизован
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (user.role === 'client') {
+                    window.location.href = 'client-dashboard.html';
+                } else if (user.role === 'developer' || user.role === 'admin') {
+                    window.location.href = 'executor.html';
+                }
+            }
+        });
     </script>
 </body>
 </html>
